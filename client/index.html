@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMISPARK x RAHASYA 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Poppins:wght@300;400;600;700&family=Courier+Prime:wght@400;700&family=Special+Elite&display=swap"
+    rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            // GHOST PURPLE & BLUE LOTUS THEME
+            bollywood: {
+              900: '#0f0c29', // Deep Indigo (Visible Background) - WAS TOO BLACK BEFORE
+              800: '#1a1b4b', // Lighter Lotus Blue
+              700: '#302b63', // Purple Haze
+            },
+            drama: {
+              DEFAULT: '#8a2be2', // Blue Violet (Primary)
+              light: '#d8b4fe',   // Lavender Glow
+              dark: '#4c1d95',    // Deep Indigo
+            },
+            glitz: {
+              gold: '#3b82f6',    // Electric Royal Blue (Highlights)
+              paper: '#e0e7ff',   // Ice White/Blue (Text)
+            },
+            // Noir/Crime Theme
+            noir: {
+              900: '#050505',
+              800: '#121212',
+              700: '#1f1f1f',
+            },
+            blood: '#dc2626',
+          },
+          fontFamily: {
+            display: ['Rozha One', 'serif'],
+            body: ['Poppins', 'sans-serif'],
+            typewriter: ['Courier Prime', 'monospace'],
+            'special-elite': ['Special Elite', 'cursive'],
+          },
+          backgroundImage: {
+            // Updated Gradients
+            'festive-pattern': 'repeating-linear-gradient(45deg, #3b82f6, #3b82f6 10px, #8a2be2 10px, #8a2be2 20px)', 
+            'stage-glow': 'radial-gradient(circle at center, #8a2be2 0%, #0f0c29 100%)',
+            'crime-pattern': 'repeating-linear-gradient(45deg, #171717, #171717 10px, #262626 10px, #262626 20px)',
+            'caution-tape': 'repeating-linear-gradient(45deg, #ffd700, #ffd700 10px, #000000 10px, #000000 20px)',
+          },
+          animation: {
+            'shimmer': 'shimmer 3s infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'flicker': 'flicker 2s infinite',
+          },
+          keyframes: {
+            shimmer: {
+              '0%, 100%': { opacity: 1 },
+              '50%': { opacity: 0.7 },
+            },
+            flicker: {
+              '0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100%': { opacity: 1 },
+              '20%, 21.999%, 63%, 63.999%, 65%, 69.999%': { opacity: 0.4 },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0f0c29; /* Matches bollywood-900 */
+      color: #e0e7ff;
+    }
+
+    /* Sparkle Effect */
+    .bollywood-grain::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+      z-index: 50;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f0c29;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #8a2be2;
+      border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #3b82f6;
+    }
+  </style>
+  <link rel="stylesheet" href="/index.css">
+</head>
+
+<body class="bollywood-grain font-body overflow-x-hidden selection:bg-drama selection:text-white">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>

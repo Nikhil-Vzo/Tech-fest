@@ -1,0 +1,230 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, Instagram, Twitter, Facebook, Sparkles, Search, FileText } from 'lucide-react';
+import { ThemeTransition } from './ThemeTransition';
+
+export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const isRahasya = location.pathname.includes('/rahasya');
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  return (
+    <div className={`min-h-screen flex flex-col ${isRahasya ? 'bg-noir-900 text-slate-300 font-mono' : 'bg-bollywood-900 text-glitz-paper font-body'}`}>
+      <ThemeTransition />
+
+      {/* Top Decoration */}
+      <div className={`h-2 w-full ${isRahasya ? 'bg-caution-tape' : 'bg-festive-pattern'}`} />
+
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${isRahasya
+        ? 'bg-noir-900/95 border-b border-slate-800 backdrop-blur-md top-2'
+        : 'bg-bollywood-900/90 border-b border-drama backdrop-blur-md top-2'
+        }`}>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <Link to={isRahasya ? "/rahasya" : "/"} className="text-2xl font-bold tracking-tighter flex items-center group">
+              {isRahasya ? (
+                <>
+                  <span className="text-white group-hover:text-blood transition-colors">RAHASYA</span>
+                  <span className="text-blood ml-1 animate-pulse">_</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-6 h-6 text-glitz-gold mr-2 animate-spin-slow" />
+                  <span className="font-display text-transparent bg-clip-text bg-gradient-to-r from-glitz-gold to-drama-light">AMISPARK</span>
+                </>
+              )}
+            </Link>
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex space-x-8 items-center">
+              {isRahasya ? (
+                // Rahasya / Tech Fest Menu (Refined)
+                <>
+                  <Link to="/rahasya" className="hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">HOME</Link>
+                  <Link to="/rahasya/about" className="hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">ABOUT CASE</Link>
+                  <Link to="/rahasya/events" className="hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">EVIDENCE (EVENTS)</Link>
+                  <Link to="/rahasya/timeline" className="hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">TIMELINE</Link>
+                  <Link to="/" className="bg-transparent hover:bg-white/10 text-white border border-white/20 px-4 py-2 text-xs tracking-widest uppercase transition-all">
+                    SWITCH TO AMISPARK
+                  </Link>
+                  <Link to="/rahasya/booking" className="bg-blood hover:bg-red-700 text-white px-6 py-2 rounded-none font-bold text-xs tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] clip-path-slanted">
+                    JOIN CASE
+                  </Link>
+                </>
+              ) : (
+                // Amispark / Bollywood Menu
+                <>
+                  <Link to="/" className="hover:text-glitz-gold transition-colors text-sm font-semibold">Home</Link>
+                  <Link to="/about" className="hover:text-glitz-gold transition-colors text-sm font-semibold">About</Link>
+                  <Link to="/events" className="hover:text-glitz-gold transition-colors text-sm font-semibold">Events</Link>
+                  <Link to="/schedule" className="hover:text-glitz-gold transition-colors text-sm font-semibold">Schedule</Link>
+                  <Link to="/gallery" className="hover:text-glitz-gold transition-colors text-sm font-semibold">Gallery</Link>
+                  <Link to="/tickets" className="bg-drama hover:bg-drama-light text-white px-6 py-2 rounded-full font-bold transition-all shadow-lg">
+                    Get Tickets
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden text-2xl"
+            >
+              {isMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className={`md:hidden mt-4 space-y-4 pb-4 ${isRahasya ? 'border-t border-slate-800' : 'border-t border-drama/30'}`}>
+              {isRahasya ? (
+                <>
+                  <Link to="/rahasya" className="block hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">HOME</Link>
+                  <Link to="/rahasya/about" className="block hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">ABOUT CASE</Link>
+                  <Link to="/rahasya/events" className="block hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">EVIDENCE</Link>
+                  <Link to="/rahasya/timeline" className="block hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">TIMELINE</Link>
+                  <Link to="/" className="block bg-transparent hover:bg-white/10 text-white border border-white/20 px-4 py-2 text-xs tracking-widest uppercase transition-all text-center">
+                    SWITCH TO AMISPARK
+                  </Link>
+                  <Link to="/rahasya/booking" className="block bg-blood hover:bg-red-700 text-white px-6 py-2 font-bold text-xs tracking-widest uppercase transition-all text-center">
+                    JOIN CASE
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/" className="block hover:text-glitz-gold transition-colors">Home</Link>
+                  <Link to="/about" className="block hover:text-glitz-gold transition-colors">About</Link>
+                  <Link to="/events" className="block hover:text-glitz-gold transition-colors">Events</Link>
+                  <Link to="/schedule" className="block hover:text-glitz-gold transition-colors">Schedule</Link>
+                  <Link to="/gallery" className="block hover:text-glitz-gold transition-colors">Gallery</Link>
+                  <Link to="/tickets" className="block bg-drama hover:bg-drama-light text-white px-6 py-2 rounded-full font-bold transition-all text-center">
+                    Get Tickets
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="flex-grow pt-20">
+        {children}
+      </main>
+
+      {/* Footer */}
+      {isRahasya ? (
+        // Rahasya Footer
+        <footer className="bg-noir-800 border-t border-slate-800 py-12 mt-20">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              {/* Column 1 */}
+              <div>
+                <h3 className="text-blood font-bold text-sm tracking-widest uppercase mb-4 flex items-center">
+                  <FileText className="w-4 h-4 mr-2" />
+                  CONFIDENTIAL FILES
+                </h3>
+                <ul className="space-y-2 text-xs text-slate-500">
+                  <li><Link to="/rahasya/about" className="hover:text-white transition-colors">CASE BRIEFING</Link></li>
+                  <li><Link to="/rahasya/events" className="hover:text-white transition-colors">EVIDENCE LOG</Link></li>
+                  <li><Link to="/rahasya/timeline" className="hover:text-white transition-colors">TIMELINE</Link></li>
+                </ul>
+              </div>
+
+              {/* Column 2 */}
+              <div>
+                <h3 className="text-blood font-bold text-sm tracking-widest uppercase mb-4">NAVIGATION</h3>
+                <ul className="space-y-2 text-xs text-slate-500">
+                  <li><Link to="/rahasya" className="hover:text-white transition-colors">HOME BASE</Link></li>
+                  <li><Link to="/rahasya/booking" className="hover:text-white transition-colors">SECURE PERMITS</Link></li>
+                  <li><Link to="/" className="hover:text-white transition-colors">RETURN TO AMISPARK</Link></li>
+                </ul>
+              </div>
+
+              {/* Column 3 */}
+              <div>
+                <h3 className="text-blood font-bold text-sm tracking-widest uppercase mb-4">HQ CONTACT</h3>
+                <ul className="space-y-2 text-xs text-slate-500">
+                  <li className="flex items-center"><Mail className="w-3 h-3 mr-2" /> classified@rahasya.tech</li>
+                  <li className="flex items-center"><Phone className="w-3 h-3 mr-2" /> [REDACTED]</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-800 pt-8 text-center text-xs text-slate-600">
+              <p>© 2026 RAHASYA TECH FEST | ALL EVIDENCE CLASSIFIED</p>
+            </div>
+          </div>
+        </footer>
+      ) : (
+        // Amispark Footer
+        <footer className="bg-bollywood-800 border-t-4 border-drama py-12 mt-20 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-festive-pattern opacity-50" />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+              {/* Column 1 */}
+              <div>
+                <h3 className="text-glitz-gold font-display text-xl mb-4 flex items-center">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  AMISPARK
+                </h3>
+                <p className="text-glitz-paper/70 text-sm">
+                  The biggest Bollywood celebration of the year. Join us for an unforgettable experience!
+                </p>
+              </div>
+
+              {/* Column 2 */}
+              <div>
+                <h3 className="text-glitz-gold font-bold text-sm uppercase mb-4">Quick Links</h3>
+                <ul className="space-y-2 text-sm text-glitz-paper/70">
+                  <li><Link to="/about" className="hover:text-glitz-gold transition-colors">About</Link></li>
+                  <li><Link to="/events" className="hover:text-glitz-gold transition-colors">Events</Link></li>
+                  <li><Link to="/schedule" className="hover:text-glitz-gold transition-colors">Schedule</Link></li>
+                  <li><Link to="/gallery" className="hover:text-glitz-gold transition-colors">Gallery</Link></li>
+                </ul>
+              </div>
+
+              {/* Column 3 */}
+              <div>
+                <h3 className="text-glitz-gold font-bold text-sm uppercase mb-4">Contact</h3>
+                <ul className="space-y-2 text-sm text-glitz-paper/70">
+                  <li className="flex items-center"><Mail className="w-4 h-4 mr-2" /> info@amispark.com</li>
+                  <li className="flex items-center"><Phone className="w-4 h-4 mr-2" /> +91 98765 43210</li>
+                  <li className="flex items-center"><MapPin className="w-4 h-4 mr-2" /> Mumbai, India</li>
+                </ul>
+              </div>
+
+              {/* Column 4 */}
+              <div>
+                <h3 className="text-glitz-gold font-bold text-sm uppercase mb-4">Follow Us</h3>
+                <div className="flex space-x-4">
+                  <a href="#" className="text-glitz-paper/70 hover:text-glitz-gold transition-colors">
+                    <Instagram className="w-5 h-5" />
+                  </a>
+                  <a href="#" className="text-glitz-paper/70 hover:text-glitz-gold transition-colors">
+                    <Twitter className="w-5 h-5" />
+                  </a>
+                  <a href="#" className="text-glitz-paper/70 hover:text-glitz-gold transition-colors">
+                    <Facebook className="w-5 h-5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-drama/30 pt-8 text-center text-sm text-glitz-paper/50">
+              <p>© 2024 Amispark. All rights reserved. Made with ❤️ for Bollywood lovers.</p>
+            </div>
+          </div>
+        </footer>
+      )}
+    </div>
+  );
+};

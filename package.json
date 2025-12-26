@@ -1,0 +1,19 @@
+{
+    "name": "amispark-x-rahasya-root",
+    "version": "1.0.0",
+    "description": "Root project for Amispark X Rahasya",
+    "private": true,
+    "workspaces": [
+        "client",
+        "server"
+    ],
+    "scripts": {
+        "dev": "concurrently \"npm run server\" \"npm run client\"",
+        "client": "npm run dev --workspace=client",
+        "server": "npm run dev --workspace=server",
+        "build": "npm run build --workspace=client"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

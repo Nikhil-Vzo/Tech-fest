@@ -1,0 +1,257 @@
+/* Staggered component fade-out during theme switch */
+@keyframes componentFade {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.fade-out>* {
+    animation: componentFade 0.4s forwards;
+}
+
+/* Apply incremental delays */
+.fade-out>*:nth-child(1) { animation-delay: 0s; }
+.fade-out>*:nth-child(2) { animation-delay: 0.05s; }
+.fade-out>*:nth-child(3) { animation-delay: 0.10s; }
+.fade-out>*:nth-child(4) { animation-delay: 0.15s; }
+.fade-out>*:nth-child(5) { animation-delay: 0.20s; }
+.fade-out>*:nth-child(6) { animation-delay: 0.25s; }
+.fade-out>*:nth-child(7) { animation-delay: 0.30s; }
+.fade-out>*:nth-child(8) { animation-delay: 0.35s; }
+.fade-out>*:nth-child(9) { animation-delay: 0.40s; }
+.fade-out>*:nth-child(10) { animation-delay: 0.45s; }
+
+/* Scrollbar Styles */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #0f0c29; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #8a2be2, #3b82f6); 
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #d8b4fe; 
+}
+
+/* --- Custom Venue Layout Grid Definition --- */
+
+.venue-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(14, 50px);
+    gap: 12px;
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #1a1b4b; /* Lighter Indigo Background */
+    padding: 24px;
+    border-radius: 8px;
+    position: relative;
+    border: 2px solid #8a2be2; /* Ghost Purple Border */
+    box-shadow: 0 0 40px rgba(138, 43, 226, 0.25);
+}
+
+.venue-noir.venue-grid {
+    background-color: rgba(5, 5, 5, 0.8);
+    border: 1px solid #1f1f1f;
+    box-shadow: none;
+}
+
+/* Common Area Styles */
+.venue-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.venue-bollywood .venue-area:hover {
+    transform: translateY(-3px);
+    z-index: 10;
+    box-shadow: 0 0 25px rgba(138, 43, 226, 0.5);
+    border-color: #d8b4fe;
+}
+
+/* 1. STAGE (Ghost Glow) */
+.area-stage-top {
+    grid-column: 5 / 9;
+    grid-row: 2 / 4;
+    background: #000;
+    border: 2px solid #8a2be2;
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #d8b4fe; /* Lavender */
+    font-family: 'Rozha One', serif;
+    text-shadow: 0 0 10px rgba(138, 43, 226, 0.6);
+}
+
+.area-stage-bottom {
+    grid-column: 6 / 8;
+    grid-row: 4 / 6;
+    background: #000;
+    border: 2px solid #8a2be2;
+    border-top: none;
+    z-index: 2;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
+}
+
+/* 2. TECH BAZAAR (Blue Lotus) */
+.venue-bollywood .area-techfest {
+    grid-column: 1 / 5;
+    grid-row: 4 / 8;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(15, 12, 41, 0.9));
+    clip-path: polygon(0 0, 100% 0, 100% 60%, 0% 100%);
+    padding: 20px 10px 10px 20px;
+    align-items: flex-start;
+    color: #60a5fa;
+    border-left: 4px solid #3b82f6; /* Royal Blue */
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+}
+
+/* 3. ROYAL BOX (Deep Purple) */
+.venue-bollywood .area-faculty {
+    grid-column: 9 / 12;
+    grid-row: 4 / 6;
+    background: linear-gradient(135deg, #302b63, #0f0c29); 
+    border-radius: 4px;
+    color: #d8b4fe;
+    border: 1px solid #8a2be2;
+}
+
+/* 4. STAR CIRCLE (White/Blue Mist) */
+.venue-bollywood .area-fanpit {
+    grid-column: 5 / 9;
+    grid-row: 6 / 8;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(59, 130, 246, 0.1));
+    border-radius: 12px;
+    border: 2px solid #d8b4fe;
+    color: #e0e7ff;
+    box-shadow: inset 0 0 15px rgba(138, 43, 226, 0.2);
+}
+
+/* 5. DJ DHAMAKA (Gradient Pill) */
+.venue-bollywood .area-dj {
+    grid-column: 5 / 9;
+    grid-row: 9 / 10;
+    background: linear-gradient(90deg, #8a2be2, #3b82f6);
+    border-radius: 9999px;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+}
+
+/* 6. GENERAL ACCESS (Indigo) */
+.venue-bollywood .area-general {
+    grid-column: 3 / 11;
+    grid-row: 11 / 14;
+    background: linear-gradient(180deg, #1e1b4b, #0f0c29);
+    border-radius: 4px;
+    border-top: 4px solid #3b82f6;
+    color: #a5b4fc;
+}
+
+.venue-bollywood .area-general:hover {
+    border-color: #8a2be2;
+    color: #fff;
+}
+
+/* 7. FOOD COURT (Subtle Blue) */
+.venue-bollywood .area-food {
+    grid-column: 3 / 11;
+    grid-row: 15 / 16;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #60a5fa;
+    border: 1px dashed #3b82f6;
+}
+
+/* Noir Theme Fallbacks */
+.venue-noir .area-techfest,
+.venue-noir .area-faculty,
+.venue-noir .area-fanpit,
+.venue-noir .area-general,
+.venue-noir .area-food,
+.venue-noir .area-dj {
+    background: rgba(10, 10, 10, 0.6);
+    border: 1px solid #333;
+    color: #64748b;
+}
+
+/* Animations */
+.area-info {
+    opacity: 1;
+    background: transparent;
+    color: inherit;
+    position: static;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.animate-blink {
+    animation: blink 3s infinite;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+.animate-glitch {
+    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+.bg-static-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-out forwards;
+}
+
+.animate-fade-out {
+    animation: fadeOut 1s ease-out forwards;
+}
