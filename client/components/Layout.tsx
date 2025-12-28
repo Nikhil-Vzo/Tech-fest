@@ -75,7 +75,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <Link to="/schedule" className="hover:text-glitz-gold transition-colors font-medium">Schedule</Link>
                   <Link to="/gallery" className="hover:text-glitz-gold transition-colors font-medium">Gallery</Link>
                   <Link to="/tickets" className="hover:text-glitz-gold transition-colors font-medium">Tickets</Link>
-                  <Link to="/rahasya" className="bg-drama hover:bg-drama-light text-white px-6 py-2 rounded-full font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 border border-glitz-gold/30">
+                  <Link to="/rahasya" className="font-mono font-bold text-blood border border-blood bg-black px-6 py-2 rounded-sm shadow-[0_0_10px_rgba(220,38,38,0.3)] hover:bg-blood hover:text-white hover:shadow-[0_0_20px_rgba(220,38,38,0.6)] transition-all tracking-widest transform hover:-translate-y-0.5">
                     RAहस्य
                   </Link>
                 </>
