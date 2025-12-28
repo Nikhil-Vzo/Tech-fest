@@ -196,10 +196,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {/* Footer */}
       {isRahasya ? (
         // Rahasya Footer (Screenshot based)
-        <footer className="bg-noir-900 border-t-4 border-slate-800 relative mt-20 text-slate-400 font-mono text-sm">
+        <footer className="bg-noir-900 border-t-4 border-slate-800 relative mt-10 md:mt-20 text-slate-400 font-mono text-sm">
           <div className="absolute top-0 left-0 w-full h-1 bg-caution-tape"></div>
-          <div className="container mx-auto px-4 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="container mx-auto px-4 py-8 md:py-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
               {/* Column 1 */}
               <div>
                 <h3 className="text-white font-bold tracking-widest mb-4 uppercase border-l-2 border-blood pl-3">CONFIDENTIAL FILES</h3>
@@ -239,19 +239,19 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-12 text-center">
+            <div className="mt-8 md:mt-12 text-center">
               <a
                 href="https://wa.me/919098893505"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-blood hover:bg-red-700 text-white px-8 py-4 font-bold text-sm tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:shadow-[0_0_30px_rgba(220,38,38,0.7)] group"
+                className="inline-flex items-center gap-3 bg-blood hover:bg-red-700 text-white px-6 py-3 md:px-8 md:py-4 font-bold text-xs md:text-sm tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:shadow-[0_0_30px_rgba(220,38,38,0.7)] group"
               >
-                <MessageCircle className="w-5 h-5 group-hover:animate-pulse" />
+                <MessageCircle className="w-4 h-4 md:w-5 md:h-5 group-hover:animate-pulse" />
                 CONTACT US ON WHATSAPP
               </a>
             </div>
 
-            <div className="border-t border-slate-800 mt-12 pt-8 flex justify-between items-center text-xs uppercase tracking-wider opacity-50">
+            <div className="border-t border-slate-800 mt-8 md:mt-12 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center text-xs uppercase tracking-wider opacity-50 gap-4 md:gap-0 text-center md:text-left">
               <p>© 2026 AMISPARK x RAHASYA. All rights reserved. CLASSIFIED.</p>
               <div className="space-x-4">
                 <a href="#" className="hover:text-white">Privacy Protocol</a>
