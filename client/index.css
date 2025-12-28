@@ -77,7 +77,7 @@
 .venue-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: repeat(14, 50px);
+    grid-template-rows: repeat(13, 50px);
     gap: 12px;
     max-width: 800px;
     margin: 20px auto;
@@ -129,7 +129,6 @@
     grid-row: 2 / 4;
     background: #000;
     border: 2px solid #8a2be2;
-    border-bottom: none;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     z-index: 2;
@@ -149,7 +148,8 @@
     background: #000;
     border: 2px solid #8a2be2;
     border-top: none;
-    z-index: 2;
+    z-index: 3;
+    margin-top: -14px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     box-shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
@@ -193,7 +193,7 @@
 /* 5. DJ DHAMAKA (Gradient Pill) */
 .venue-bollywood .area-dj {
     grid-column: 5 / 9;
-    grid-row: 9 / 10;
+    grid-row: 8 / 9;
     background: linear-gradient(90deg, #8a2be2, #3b82f6);
     border-radius: 9999px;
     color: white;
@@ -205,7 +205,7 @@
 /* 6. GENERAL ACCESS (Indigo) */
 .venue-bollywood .area-general {
     grid-column: 3 / 11;
-    grid-row: 11 / 14;
+    grid-row: 9 / 12;
     background: linear-gradient(180deg, #1e1b4b, #0f0c29);
     border-radius: 4px;
     border-top: 4px solid #3b82f6;
@@ -220,7 +220,7 @@
 /* 7. FOOD COURT (Subtle Blue) */
 .venue-bollywood .area-food {
     grid-column: 3 / 11;
-    grid-row: 15 / 16;
+    grid-row: 12 / 13;
     background: rgba(59, 130, 246, 0.1);
     border-radius: 4px;
     font-size: 0.9rem;

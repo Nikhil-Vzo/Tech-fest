@@ -87,14 +87,14 @@ export const Booking: React.FC = () => {
             if (isAmity) {
                 // Amity Students: Can ONLY book General or Star Circle
                 if (tier.id === 'tech-fest') {
-                    setToast({ message: "Tech Bazar is reserved for external participants.", type: 'error' });
+                    setToast({ message: "Tech Bazaar is reserved for external participants.", type: 'error' });
                     setTimeout(() => setToast(null), 3000);
                     return;
                 }
             } else {
                 // Non-Amity: Can ONLY book Tech Bazar
                 if (tier.id !== 'tech-fest') {
-                    setToast({ message: "External participants can only book Tech Bazar.", type: 'error' });
+                    setToast({ message: "External participants can only book Tech Bazaar.", type: 'error' });
                     setTimeout(() => setToast(null), 3000);
                     return;
                 }
@@ -227,8 +227,8 @@ export const Booking: React.FC = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             {/* FIXED: Added [&>option]:bg-bollywood-900 to ensure dropdown visibility */}
-                                            <select 
-                                                {...register('gender')} 
+                                            <select
+                                                {...register('gender')}
                                                 className={`w-full p-3 rounded border ${isRahasya ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-white/10 border-white/20 text-white [&>option]:bg-bollywood-900'} focus:outline-none focus:border-drama`}
                                             >
                                                 <option value="">Select Gender</option>
@@ -240,8 +240,8 @@ export const Booking: React.FC = () => {
                                         </div>
                                         <div>
                                             {/* FIXED: Added [&>option]:bg-bollywood-900 to ensure dropdown visibility */}
-                                            <select 
-                                                {...register('college')} 
+                                            <select
+                                                {...register('college')}
                                                 className={`w-full p-3 rounded border ${isRahasya ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-white/10 border-white/20 text-white [&>option]:bg-bollywood-900'} focus:outline-none focus:border-drama`}
                                             >
                                                 <option value="">Select College</option>
@@ -289,7 +289,9 @@ export const Booking: React.FC = () => {
                                         <div className={`venue-area area-stage-top ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
                                             <span>{isRahasya ? 'MAIN TERMINAL' : 'STAGE'}</span>
                                         </div>
-                                        <div className={`venue-area area-stage-bottom ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}></div>
+                                        <div className={`venue-area area-stage-bottom ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
+                                            <span>{isRahasya ? 'ACCESS TUNNEL' : 'RAMP'}</span>
+                                        </div>
 
                                         {/* Areas */}
                                         {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'forensics' : 'tech-fest')).map(tier => (
