@@ -53,7 +53,7 @@ export const Home: React.FC = () => {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden">
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden w-full">
 
         {/* Background Overlay */}
         <div className="absolute inset-0 bg-stage-glow opacity-90 z-0" />
@@ -82,10 +82,10 @@ export const Home: React.FC = () => {
           <Countdown />
 
           <div className="flex flex-col md:flex-row gap-6 justify-center mt-12">
-            <Button onClick={() => navigate('/tickets')} className="min-w-[200px] bg-drama hover:bg-drama-light">
+            <Button onClick={() => navigate('/tickets')} className="min-w-[200px] bg-gradient-to-r from-drama to-drama-dark hover:from-drama-dark hover:to-drama text-white hover:scale-105 hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] transition-all duration-300 border border-white/10">
               Book Tickets
             </Button>
-            <Button variant="secondary" onClick={() => navigate('/events')} className="min-w-[200px] border-glitz-gold text-glitz-gold hover:bg-glitz-gold hover:text-bollywood-900">
+            <Button variant="secondary" onClick={() => navigate('/events')} className="min-w-[200px] border-amber-500 text-amber-500 hover:bg-gradient-to-r hover:from-amber-400 hover:to-amber-600 !hover:text-black font-bold hover:scale-105 transition-all duration-300 hover:border-transparent hover:shadow-[0_0_20px_rgba(245,158,11,0.5)]">
               View Events
             </Button>
           </div>

@@ -58,12 +58,13 @@ export const ThemeTransition: React.FC = () => {
                 )}
 
                 {transitionType === 'to-amispark' && (
-                    <div className="animate-fade-in">
-                        <h1 className="text-5xl md:text-8xl font-bold text-glitz-gold font-display animate-glitch tracking-tighter mb-4 drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]">
-                            RESTORING FESTIVAL
+                    <div className="relative animate-fade-in flex flex-col items-center">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500 blur-3xl opacity-20 animate-pulse rounded-full" />
+                        <h1 className="relative text-6xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-purple-500 to-pink-500 font-display animate-bounce-slow tracking-tighter mb-4 drop-shadow-[0_0_25px_rgba(236,72,153,0.5)]">
+                            BACK TO FUN
                         </h1>
-                        <p className="text-xl md:text-2xl text-white font-body animate-pulse tracking-[0.5em] uppercase">
-                            RETURNING TO CELEBRATION...
+                        <p className="relative text-xl md:text-3xl text-white font-body animate-pulse tracking-[0.3em] font-bold uppercase mt-4">
+                            ✨ LET THE PARTY BEGIN ✨
                         </p>
                     </div>
                 )}

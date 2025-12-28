@@ -9,6 +9,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const isRahasya = location.pathname.includes('/rahasya');
+  const [hoverStyle, setHoverStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
   // Close menu on route change
   useEffect(() => {
@@ -24,7 +25,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, [location.pathname]);
 
   return (
-    <div className={`min-h-screen flex flex-col ${isRahasya ? 'bg-noir-900 text-slate-300 font-mono' : 'bg-bollywood-900 text-glitz-paper font-body'} ${isFading ? 'fade-out' : ''} transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+    <div className={`min-h-screen flex flex-col w-full overflow-x-hidden ${isRahasya ? 'bg-noir-900 text-slate-300 font-mono' : 'bg-bollywood-900 text-glitz-paper font-body'} ${isFading ? 'fade-out' : ''} transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
       <ThemeTransition />
       {/* Top Decoration */}
       <div className={`h-2 w-full ${isRahasya ? 'bg-caution-tape' : 'bg-festive-pattern'}`} />
@@ -50,40 +51,101 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               )}
             </Link>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-8 items-center">
-              {isRahasya ? (
-                // Rahasya / Tech Fest Menu (Refined)
-                <>
-                  <Link to="/rahasya" className="hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">HOME</Link>
-                  <Link to="/rahasya/about" className="hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">ABOUT RAहस्य</Link>
-                  <Link to="/rahasya/events" className="hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">EVENTS</Link>
-                  <Link to="/rahasya/timeline" className="hover:text-blood transition-colors text-xs font-bold tracking-widest uppercase text-slate-400">TIMELINE</Link>
-                  <Link to="/" className="bg-transparent hover:bg-white/10 text-white border border-white/20 px-4 py-2 text-xs tracking-widest uppercase transition-all">
-                    AMISPARK
-                  </Link>
-                  <Link to="/rahasya/booking" className="bg-blood hover:bg-red-700 text-white px-6 py-2 rounded-none font-bold text-xs tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] clip-path-slanted">
-                    BUY TICKETS
-                  </Link>
-                </>
-              ) : (
-                // Amispark / Bollywood Menu
-                <>
-                  <Link to="/" className="hover:text-glitz-gold transition-colors font-medium">Home</Link>
-                  <Link to="/about" className="hover:text-glitz-gold transition-colors font-medium">About</Link>
-                  <Link to="/events" className="hover:text-glitz-gold transition-colors font-medium">Events</Link>
-                  <Link to="/schedule" className="hover:text-glitz-gold transition-colors font-medium">Schedule</Link>
-                  <Link to="/gallery" className="hover:text-glitz-gold transition-colors font-medium">Gallery</Link>
-                  <Link to="/tickets" className="hover:text-glitz-gold transition-colors font-medium">Tickets</Link>
-                  <Link to="/rahasya" className="font-mono font-bold text-blood border border-blood bg-black px-6 py-2 rounded-sm shadow-[0_0_10px_rgba(220,38,38,0.3)] hover:bg-blood hover:text-white hover:shadow-[0_0_20px_rgba(220,38,38,0.6)] transition-all tracking-widest transform hover:-translate-y-0.5">
-                    RAहस्य
-                  </Link>
-                </>
-              )}
+            {/* Desktop Menu with Sliding Blob */}
+            <div className="hidden md:flex relative items-center" onMouseLeave={() => setHoverStyle((prev) => ({ ...prev, opacity: 0 }))}>
+              {/* The Blob */}
+              <div
+                className={`absolute transition-all duration-300 ease-out rounded-full z-0 ${isRahasya
+                  ? 'bg-blood/20 border border-blood/40 shadow-[0_0_15px_rgba(220,38,38,0.3)]'
+                  : 'bg-white/20 backdrop-blur-lg border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                  }`}
+                style={{
+                  left: hoverStyle.left,
+                  width: hoverStyle.width,
+                  height: '36px', // Fixed height for consistency
+                  opacity: hoverStyle.opacity,
+                  top: '50%',
+                  transform: 'translateY(-50%)'
+                }}
+              />
+
+              {/* Menu Items */}
+              <div className="flex space-x-2 relative z-10">
+                {isRahasya ? (
+                  <>
+                    {[
+                      { path: '/rahasya', label: 'HOME' },
+                      { path: '/rahasya/about', label: 'ABOUT RAहस्य' },
+                      { path: '/rahasya/events', label: 'EVENTS' },
+                      { path: '/rahasya/timeline', label: 'TIMELINE' },
+                    ].map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className="px-4 py-2 text-xs font-bold tracking-widest uppercase text-slate-400 hover:text-blood transition-colors rounded-md"
+                        onMouseEnter={(e) => {
+                          const target = e.currentTarget;
+                          setHoverStyle({
+                            left: target.offsetLeft,
+                            width: target.offsetWidth,
+                            opacity: 1
+                          });
+                        }}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+
+                    {/* Access Buttons (No Blob) */}
+                    <div className="flex items-center ml-4 space-x-2" onMouseEnter={() => setHoverStyle(prev => ({ ...prev, opacity: 0 }))}>
+                      <Link to="/" className="bg-transparent hover:bg-white/10 text-white border border-white/20 px-4 py-2 text-xs tracking-widest uppercase transition-all">
+                        AMISPARK
+                      </Link>
+                      <Link to="/rahasya/booking" className="bg-blood hover:bg-red-700 text-white px-6 py-2 rounded-none font-bold text-xs tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] clip-path-slanted">
+                        BUY TICKETS
+                      </Link>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {[
+                      { path: '/', label: 'Home' },
+                      { path: '/about', label: 'About' },
+                      { path: '/events', label: 'Events' },
+                      { path: '/schedule', label: 'Schedule' },
+                      { path: '/gallery', label: 'Gallery' },
+                      { path: '/tickets', label: 'Tickets' },
+                    ].map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className="px-4 py-2 text-white font-medium hover:text-glitz-gold transition-colors rounded-full"
+                        onMouseEnter={(e) => {
+                          const target = e.currentTarget;
+                          setHoverStyle({
+                            left: target.offsetLeft,
+                            width: target.offsetWidth,
+                            opacity: 1
+                          });
+                        }}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+
+                    {/* Rahasya Button (No Blob) */}
+                    <div className="ml-4" onMouseEnter={() => setHoverStyle(prev => ({ ...prev, opacity: 0 }))}>
+                      <Link to="/rahasya" className="font-mono font-bold text-blood border border-blood bg-black px-6 py-2 rounded-sm shadow-[0_0_10px_rgba(220,38,38,0.3)] hover:bg-blood hover:text-white hover:shadow-[0_0_20px_rgba(220,38,38,0.6)] transition-all tracking-widest transform hover:-translate-y-0.5">
+                        RAहस्य
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
-            <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className="md:hidden text-white ml-auto" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
@@ -91,7 +153,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className={`md:hidden absolute w-full h-screen ${isRahasya ? 'bg-noir-900' : 'bg-bollywood-900'} p-4 top-full left-0`}>
+          <div className={`md:hidden fixed inset-0 top-[73px] w-full h-[calc(100vh-73px)] ${isRahasya ? 'bg-noir-900 border-t border-slate-800' : 'bg-bollywood-900 border-t border-drama/30'} p-6 overflow-y-auto slide-in-bottom z-40`}>
             <div className="flex flex-col space-y-4 text-center text-xl mt-10">
               {isRahasya ? (
                 <>
@@ -108,13 +170,17 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <Link to="/about" className="hover:text-glitz-gold">About</Link>
                   <Link to="/events" className="hover:text-glitz-gold">Events</Link>
                   <Link to="/schedule" className="hover:text-glitz-gold">Schedule</Link>
-                  <Link to="/gallery" className="hover:text-glitz-gold">Gallery</Link>
-                  <Link to="/tickets" className="hover:text-glitz-gold">Tickets</Link>
-                  <Link to="/rahasya" className="text-drama hover:text-drama-light font-bold mt-4" onClick={(e) => {
+                  <Link to="/gallery" className="hover:text-glitz-gold py-2">Gallery</Link>
+                  <Link to="/tickets" className="bg-gradient-to-r from-drama to-drama-dark text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all mt-2 w-auto min-w-[200px] mx-auto">
+                    BOOK TICKETS
+                  </Link>
+                  <Link to="/rahasya" className="font-mono font-bold text-blood border-2 border-blood bg-black py-3 px-6 rounded-sm shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:bg-blood hover:text-white transition-all tracking-[0.2em] transform hover:-translate-y-1 mt-4 w-auto min-w-[200px] mx-auto text-lg" onClick={(e) => {
                     e.preventDefault();
                     setIsFading(true);
                     setTimeout(() => navigate('/rahasya'), 500);
-                  }}>रहस्य (Tech Fest)</Link>
+                  }}>
+                    RAहस्य_ENTER
+                  </Link>
                 </>
               )}
             </div>
