@@ -161,7 +161,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <Link to="/rahasya/about" className="hover:text-blood">ABOUT</Link>
                   <Link to="/rahasya/timeline" className="hover:text-blood">TIMELINE</Link>
                   <Link to="/rahasya/events" className="hover:text-blood">EVIDENCE</Link>
-                  <Link to="/rahasya/booking" className="hover:text-blood">PERMITS</Link>
+                  <Link to="/rahasya/booking" className="hover:text-blood">BUY TICKETS</Link>
                   <Link to="/" className="text-blood font-bold mt-4 border border-blood p-2 inline-block mx-auto">EXIT INVESTIGATION</Link>
                 </>
               ) : (

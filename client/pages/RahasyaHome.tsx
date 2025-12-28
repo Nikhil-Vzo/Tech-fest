@@ -80,20 +80,20 @@ export const RahasyaHome: React.FC = () => {
                 >
 
                     <motion.div variants={itemVariants} className="mb-6 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
-                        <span className="bg-blood text-black px-6 py-2 text-sm font-bold tracking-[0.3em] uppercase shadow-[0_0_25px_rgba(220,38,38,0.8)] font-special-elite animate-pulse border-2 border-white">
+                        <span className="bg-blood text-black px-4 md:px-6 py-2 text-[10px] md:text-sm font-bold tracking-widest md:tracking-[0.3em] uppercase shadow-[0_0_25px_rgba(220,38,38,0.8)] font-special-elite animate-pulse border-2 border-white whitespace-nowrap">
                             ⚠ SYSTEM BREACH DETECTED ⚠
                         </span>
                     </motion.div>
 
-                    <motion.div variants={itemVariants} className="border-x-4 border-blood/50 px-8 py-8 mb-8 backdrop-blur-md bg-black/60 w-full max-w-4xl relative overflow-hidden group shadow-2xl">
+                    <motion.div variants={itemVariants} className="border-x-4 border-blood/50 px-4 py-6 md:px-8 md:py-8 mb-8 backdrop-blur-md bg-black/60 w-full max-w-4xl relative overflow-hidden group shadow-2xl">
                         {/* Glitch Overlay Elements */}
                         <div className="absolute top-0 left-0 w-full h-1 bg-blood/20 animate-pulse"></div>
                         <div className="absolute bottom-0 left-0 w-full h-1 bg-blood/20 animate-pulse"></div>
 
-                        <h1 className="text-5xl md:text-7xl font-bold text-white tracking-[0.15em] text-center font-special-elite leading-tight drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">
+                        <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-white tracking-[0.15em] text-center font-special-elite leading-tight drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">
                             AMISPARK <span className="text-blood text-glow-red inline-block hover:animate-glitch">x</span> RAहस्य
                         </h1>
-                        <p className="mt-4 text-blood/80 tracking-[0.5em] text-sm uppercase font-bold">/// CLASSIFIED EVENT PROTOCOL_2026 ///</p>
+                        <p className="mt-4 text-blood/80 tracking-widest md:tracking-[0.5em] text-[10px] md:text-sm uppercase font-bold whitespace-nowrap">/// CLASSIFIED EVENT PROTOCOL_2026 ///</p>
                     </motion.div>
 
                     <motion.div variants={itemVariants} className="max-w-2xl border-l-2 border-blood pl-6 py-4 mb-10 w-full text-left bg-gradient-to-r from-black/60 to-transparent">
@@ -125,7 +125,7 @@ export const RahasyaHome: React.FC = () => {
                     <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-8 w-full max-w-2xl">
                         <Link to="/rahasya/booking" className="flex-1 group">
                             <button className="w-full bg-blood hover:bg-black hover:text-blood border-2 border-transparent hover:border-blood text-white py-5 px-8 font-bold tracking-[0.2em] uppercase transition-all shadow-[0_0_30px_rgba(220,38,38,0.5)] hover:shadow-[0_0_50px_rgba(220,38,38,0.8)] clip-path-slanted font-special-elite text-lg relative overflow-hidden">
-                                <span className="relative z-10">INITIALIZE UPLINK</span>
+                                <span className="relative z-10">BUY TICKETS</span>
                             </button>
                         </Link>
                         <Link to="/rahasya/events" className="flex-1">
