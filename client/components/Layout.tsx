@@ -55,9 +55,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <div className="hidden md:flex relative items-center" onMouseLeave={() => setHoverStyle((prev) => ({ ...prev, opacity: 0 }))}>
               {/* The Blob */}
               <div
-                className={`absolute transition-all duration-300 ease-out rounded-full z-0 ${isRahasya
+                className={`absolute transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] rounded-full z-0 ${isRahasya
                   ? 'bg-blood/20 border border-blood/40 shadow-[0_0_15px_rgba(220,38,38,0.3)]'
-                  : 'bg-white/20 backdrop-blur-lg border border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                  : 'bg-gradient-to-b from-white/70 to-white/30 backdrop-blur-xl border border-white/60 shadow-[0_0_20px_rgba(255,255,255,0.5)]'
                   }`}
                 style={{
                   left: hoverStyle.left,
@@ -119,7 +119,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       <Link
                         key={item.path}
                         to={item.path}
-                        className="px-4 py-2 text-white font-medium hover:text-glitz-gold transition-colors rounded-full"
+                        className="px-4 py-2 text-white font-semibold hover:text-bollywood-900 transition-colors duration-300 rounded-full z-10 relative"
                         onMouseEnter={(e) => {
                           const target = e.currentTarget;
                           setHoverStyle({
