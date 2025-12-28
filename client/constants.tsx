@@ -99,3 +99,51 @@ export const CHHATTISGARH_COLLEGES = [
     "ICFAI University",
     "Other"
 ];
+
+export const RAHASYA_EVENTS = [
+    {
+        id: 'r1',
+        date: 'Day 1',
+        time: '10:00 AM',
+        category: 'Tech',
+        title: 'CTF: Capture The Flag',
+        location: 'Computer Lab 1',
+        description: 'Compete to find hidden flags in our secure system. Requires laptop.',
+    },
+    {
+        id: 'r2',
+        date: 'Day 1',
+        time: '02:00 PM',
+        category: 'Workshop',
+        title: 'Ethical Hacking 101',
+        location: 'Seminar Hall B',
+        description: 'Introduction to cybersecurity and vulnerability assessment.',
+    },
+    {
+        id: 'r3',
+        date: 'Day 2',
+        time: '11:00 AM',
+        category: 'Competition',
+        title: 'Code Mystery',
+        location: 'Lab 2',
+        description: 'Debug the obfuscated code to reveal the next clue.',
+    },
+    {
+        id: 'r4',
+        date: 'Day 2',
+        time: '04:00 PM',
+        category: 'Exhibition',
+        title: 'Forensic AI Showcase',
+        location: 'Innovation Hub',
+        description: 'Demonstration of AI tools used in digital investigations.',
+    },
+];
+
+export const RAHASYA_BACKGROUNDS = [
+    'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1920&auto=format&fit=crop', // Cyberpunk Street
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1920&auto=format&fit=crop', // Circuit Board
+    'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1920&auto=format&fit=crop', // Matrix Code
+    'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=1920&auto=format&fit=crop', // Dark Tech
+    'https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?q=80&w=1920&auto=format&fit=crop', // Programmer
+    'https://images.unsplash.com/photo-1504384308090-c54be3855091?q=80&w=1920&auto=format&fit=crop', // Dark Abstract
+];

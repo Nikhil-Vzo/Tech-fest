@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/UIComponents';
 import { MapPin, Calendar, Clock } from 'lucide-react';
+import { AmisparkFloatingIcons } from '../components/AmisparkFloatingIcons';
 
 const Countdown: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -58,6 +59,9 @@ export const Home: React.FC = () => {
         <div className="absolute inset-0 bg-stage-glow opacity-90 z-0" />
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center opacity-20 z-0 mix-blend-overlay" />
 
+        {/* Floating Party Icons */}
+        <AmisparkFloatingIcons />
+
         <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center">
           <div className="mb-4 inline-block bg-drama text-white px-4 py-1 text-sm font-bold tracking-[0.3em] uppercase transform -rotate-2 shadow-lg">
             Lights, Camera, Action!
@@ -89,10 +93,13 @@ export const Home: React.FC = () => {
       </section>
 
       {/* Info Strip */}
-      <div className="bg-glitz-gold text-bollywood-900 py-4 font-bold font-body text-sm overflow-hidden whitespace-nowrap border-y-4 border-drama">
-        <div className="inline-block animate-shimmer px-4">
-          ★ ★ ★ WELCOME TO THE BIGGEST BOLLYWOOD FESTIVAL OF THE YEAR ★ ★ ★ GET YOUR TICKETS NOW ★ ★ ★
-          WELCOME TO THE BIGGEST BOLLYWOOD FESTIVAL OF THE YEAR ★ ★ ★ GET YOUR TICKETS NOW ★ ★ ★
+      <div className="bg-glitz-gold text-bollywood-900 py-4 font-bold font-body text-sm overflow-hidden whitespace-nowrap border-y-4 border-drama mt-12">
+        <div className="flex animate-marquee">
+          {[...Array(10)].map((_, i) => (
+            <span key={i} className="mx-4 flex items-center">
+              ★ WELCOME TO THE BIGGEST BOLLYWOOD FESTIVAL OF THE YEAR ★ GET YOUR TICKETS NOW
+            </span>
+          ))}
         </div>
       </div>
 

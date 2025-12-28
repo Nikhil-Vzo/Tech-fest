@@ -1,7 +1,12 @@
 /* Staggered component fade-out during theme switch */
 @keyframes componentFade {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 .fade-out>* {
@@ -9,30 +14,62 @@
 }
 
 /* Apply incremental delays */
-.fade-out>*:nth-child(1) { animation-delay: 0s; }
-.fade-out>*:nth-child(2) { animation-delay: 0.05s; }
-.fade-out>*:nth-child(3) { animation-delay: 0.10s; }
-.fade-out>*:nth-child(4) { animation-delay: 0.15s; }
-.fade-out>*:nth-child(5) { animation-delay: 0.20s; }
-.fade-out>*:nth-child(6) { animation-delay: 0.25s; }
-.fade-out>*:nth-child(7) { animation-delay: 0.30s; }
-.fade-out>*:nth-child(8) { animation-delay: 0.35s; }
-.fade-out>*:nth-child(9) { animation-delay: 0.40s; }
-.fade-out>*:nth-child(10) { animation-delay: 0.45s; }
+.fade-out>*:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.fade-out>*:nth-child(2) {
+    animation-delay: 0.05s;
+}
+
+.fade-out>*:nth-child(3) {
+    animation-delay: 0.10s;
+}
+
+.fade-out>*:nth-child(4) {
+    animation-delay: 0.15s;
+}
+
+.fade-out>*:nth-child(5) {
+    animation-delay: 0.20s;
+}
+
+.fade-out>*:nth-child(6) {
+    animation-delay: 0.25s;
+}
+
+.fade-out>*:nth-child(7) {
+    animation-delay: 0.30s;
+}
+
+.fade-out>*:nth-child(8) {
+    animation-delay: 0.35s;
+}
+
+.fade-out>*:nth-child(9) {
+    animation-delay: 0.40s;
+}
+
+.fade-out>*:nth-child(10) {
+    animation-delay: 0.45s;
+}
 
 /* Scrollbar Styles */
 .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: #0f0c29; 
+    background: #0f0c29;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #8a2be2, #3b82f6); 
+    background: linear-gradient(to bottom, #8a2be2, #3b82f6);
     border-radius: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #d8b4fe; 
+    background: #d8b4fe;
 }
 
 /* --- Custom Venue Layout Grid Definition --- */
@@ -44,11 +81,13 @@
     gap: 12px;
     max-width: 800px;
     margin: 20px auto;
-    background-color: #1a1b4b; /* Lighter Indigo Background */
+    background-color: #1a1b4b;
+    /* Lighter Indigo Background */
     padding: 24px;
     border-radius: 8px;
     position: relative;
-    border: 2px solid #8a2be2; /* Ghost Purple Border */
+    border: 2px solid #8a2be2;
+    /* Ghost Purple Border */
     box-shadow: 0 0 40px rgba(138, 43, 226, 0.25);
 }
 
@@ -98,7 +137,8 @@
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    color: #d8b4fe; /* Lavender */
+    color: #d8b4fe;
+    /* Lavender */
     font-family: 'Rozha One', serif;
     text-shadow: 0 0 10px rgba(138, 43, 226, 0.6);
 }
@@ -124,7 +164,8 @@
     padding: 20px 10px 10px 20px;
     align-items: flex-start;
     color: #60a5fa;
-    border-left: 4px solid #3b82f6; /* Royal Blue */
+    border-left: 4px solid #3b82f6;
+    /* Royal Blue */
     text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
 }
 
@@ -132,7 +173,7 @@
 .venue-bollywood .area-faculty {
     grid-column: 9 / 12;
     grid-row: 4 / 6;
-    background: linear-gradient(135deg, #302b63, #0f0c29); 
+    background: linear-gradient(135deg, #302b63, #0f0c29);
     border-radius: 4px;
     color: #d8b4fe;
     border: 1px solid #8a2be2;
@@ -213,8 +254,15 @@
 }
 
 @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
 }
 
 .animate-blink {
@@ -222,12 +270,29 @@
 }
 
 @keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(-2px, -2px);
+    }
+
+    60% {
+        transform: translate(2px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
 }
 
 .animate-glitch {
@@ -239,13 +304,23 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 .animate-fade-in {
@@ -254,4 +329,70 @@
 
 .animate-fade-out {
     animation: fadeOut 1s ease-out forwards;
+}
+
+/* Custom Utilities for Rahasya */
+.bg-caution-tape {
+    background-color: #facc15;
+    background-image: repeating-linear-gradient(45deg,
+            #facc15,
+            #facc15 10px,
+            #eab308 10px,
+            #eab308 20px);
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 20s linear infinite;
+}
+
+/* Rahasya Visual Effects */
+.bg-scanline {
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.3) 50%,
+            rgba(0, 0, 0, 0.3));
+    background-size: 100% 4px;
+}
+
+.bg-vignette {
+    background: radial-gradient(circle at center,
+            rgba(0, 0, 0, 0) 50%,
+            rgba(0, 0, 0, 0.9) 100%);
+}
+
+.text-glow-red {
+    text-shadow: 0 0 15px rgba(220, 38, 38, 0.8), 0 0 30px rgba(220, 38, 38, 0.4);
+}
+
+/* Lenis Smooth Scroll Styles */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+    pointer-events: none;
 }

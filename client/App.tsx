@@ -9,6 +9,8 @@ import { Schedule } from './pages/Schedule';
 import { Gallery } from './pages/Gallery';
 import { RahasyaHome } from './pages/RahasyaHome';
 import { RahasyaEvents } from './pages/RahasyaEvents';
+import { RahasyaTimeline } from './pages/RahasyaTimeline';
+import { RahasyaAbout } from './pages/RahasyaAbout';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="/rahasya" element={<RahasyaHome />} />
           <Route path="/rahasya/booking" element={<Booking />} />
           <Route path="/rahasya/events" element={<RahasyaEvents />} />
+          <Route path="/rahasya/about" element={<RahasyaAbout />} />
+          <Route path="/rahasya/timeline" element={<RahasyaTimeline />} />
         </Routes>
       </Layout>
     </HashRouter>

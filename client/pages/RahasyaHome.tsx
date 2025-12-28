@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Lock, Search, Calendar, MapPin, Clock } from 'lucide-react';
-import { Button } from '../components/UIComponents';
+import { Calendar, MapPin, Clock } from 'lucide-react';
+import { RAHASYA_BACKGROUNDS } from '../constants';
+import { RahasyaCanvas } from '../components/RahasyaCanvas';
+import { SmoothScroll } from '../components/SmoothScroll';
+import { motion } from 'framer-motion';
 
 export const RahasyaHome: React.FC = () => {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    const [bgImage, setBgImage] = useState('');
 
     useEffect(() => {
-        const targetDate = new Date('2026-02-17T00:00:00'); // Updated to Oct 15 as per screenshot
+        const randomBg = RAHASYA_BACKGROUNDS[Math.floor(Math.random() * RAHASYA_BACKGROUNDS.length)];
+        setBgImage(randomBg);
+
+        const targetDate = new Date('2026-02-17T00:00:00');
         const interval = setInterval(() => {
             const now = new Date();
             const difference = targetDate.getTime() - now.getTime();
@@ -25,73 +32,116 @@ export const RahasyaHome: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
+    // Animation Variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.2,
+                delayChildren: 2.5
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: { duration: 0.8, ease: "easeOut" as const }
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-noir-900 text-slate-300 font-mono selection:bg-blood selection:text-white">
+        <div className="min-h-screen bg-noir-900 text-slate-300 font-mono selection:bg-blood selection:text-white overflow-hidden">
+            <SmoothScroll />
+
+            {/* 3D Background Layer */}
+            <RahasyaCanvas />
+
             {/* Hero Section */}
-            <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden pt-20">
-                {/* Background Overlay */}
-                <div className="absolute inset-0 bg-black opacity-90 z-0" />
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center opacity-20 z-0 mix-blend-overlay" />
+            <section className="relative min-h-screen h-auto flex flex-col items-center justify-start overflow-hidden pt-0 -mt-2 pb-32">
+                {/* Fallback Background for reliability + Blend */}
+                <div
+                    className="absolute inset-0 bg-cover bg-center opacity-20 z-0 transition-opacity duration-1000"
+                    style={{ backgroundImage: `url('${bgImage}')` }}
+                />
 
-                <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center p-4 w-full">
+                {/* Visual Effects Overlays */}
+                <div className="absolute inset-0 bg-scanline z-0 pointer-events-none opacity-30 mix-blend-overlay" />
+                <div className="absolute inset-0 bg-vignette z-0 pointer-events-none" />
 
-                    <div className="mb-8 transform -rotate-2">
-                        <span className="bg-blood text-white px-6 py-2 text-sm font-bold tracking-[0.2em] uppercase shadow-[0_0_15px_rgba(220,38,38,0.5)] font-special-elite">
-                            INVESTIGATION ACTIVE
+                <motion.div
+                    className="relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center p-4 w-full"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+
+                    <motion.div variants={itemVariants} className="mb-6 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
+                        <span className="bg-blood text-black px-6 py-2 text-sm font-bold tracking-[0.3em] uppercase shadow-[0_0_25px_rgba(220,38,38,0.8)] font-special-elite animate-pulse border-2 border-white">
+                            ⚠ SYSTEM BREACH DETECTED ⚠
                         </span>
-                    </div>
+                    </motion.div>
 
-                    <div className="border border-white/30 px-12 py-4 mb-12 backdrop-blur-sm bg-black/30 w-full max-w-3xl">
-                        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-[0.2em] text-center font-special-elite">
-                            AMISPARK <span className="text-blood">x</span> RAहस्य
+                    <motion.div variants={itemVariants} className="border-x-4 border-blood/50 px-8 py-8 mb-8 backdrop-blur-md bg-black/60 w-full max-w-4xl relative overflow-hidden group shadow-2xl">
+                        {/* Glitch Overlay Elements */}
+                        <div className="absolute top-0 left-0 w-full h-1 bg-blood/20 animate-pulse"></div>
+                        <div className="absolute bottom-0 left-0 w-full h-1 bg-blood/20 animate-pulse"></div>
+
+                        <h1 className="text-5xl md:text-7xl font-bold text-white tracking-[0.15em] text-center font-special-elite leading-tight drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">
+                            AMISPARK <span className="text-blood text-glow-red inline-block hover:animate-glitch">x</span> RAहस्य
                         </h1>
-                    </div>
+                        <p className="mt-4 text-blood/80 tracking-[0.5em] text-sm uppercase font-bold">/// CLASSIFIED EVENT PROTOCOL_2026 ///</p>
+                    </motion.div>
 
-                    <div className="max-w-3xl border-y border-slate-700 py-8 mb-12 w-full">
-                        <p className="text-xl md:text-2xl text-slate-300 font-special-elite leading-relaxed">
-                            "Every line of code is a clue. Every bug is a<br />
-                            <span className="text-white font-bold">suspect.</span>"
+                    <motion.div variants={itemVariants} className="max-w-2xl border-l-2 border-blood pl-6 py-4 mb-10 w-full text-left bg-gradient-to-r from-black/60 to-transparent">
+                        <p className="text-2xl md:text-3xl text-slate-200 font-special-elite leading-snug">
+                            "IN A CITY OF ALGORITHMS,<br />
+                            <span className="text-blood font-bold text-glow-red">TRUTH</span> IS THE ONLY<br />
+                            UNPATCHABLE BUG."
                         </p>
-                    </div>
+                    </motion.div>
 
                     {/* Countdown */}
-                    <div className="flex gap-4 md:gap-8 mb-12">
+                    <motion.div variants={itemVariants} className="flex gap-4 md:gap-8 mb-12">
                         {[
-                            { label: 'DAYS', value: timeLeft.days },
-                            { label: 'HOURS', value: timeLeft.hours },
-                            { label: 'MINUTES', value: timeLeft.minutes },
-                            { label: 'SECONDS', value: timeLeft.seconds }
+                            { label: 'T-MINUS DAYS', value: timeLeft.days },
+                            { label: 'HRS', value: timeLeft.hours },
+                            { label: 'MIN', value: timeLeft.minutes },
+                            { label: 'SEC', value: timeLeft.seconds }
                         ].map((item) => (
-                            <div key={item.label} className="flex flex-col items-center">
-                                <div className="w-20 h-24 md:w-24 md:h-32 border border-slate-700 bg-black/50 flex items-center justify-center mb-2 relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-blood/10 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                                    <span className="text-4xl md:text-5xl font-bold text-blood font-special-elite z-10">{item.value.toString().padStart(2, '0')}</span>
+                            <div key={item.label} className="flex flex-col items-center group">
+                                <div className="w-16 h-20 md:w-24 md:h-32 bg-black/80 border-2 border-slate-800 group-hover:border-blood flex items-center justify-center mb-2 relative overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-colors duration-300">
+                                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(220,38,38,0.1)_50%,transparent_75%)] bg-[length:250%_250%] animate-shine"></div>
+                                    <span className="text-3xl md:text-5xl font-bold text-white group-hover:text-blood font-special-elite z-10 font-mono">{item.value.toString().padStart(2, '0')}</span>
                                 </div>
-                                <span className="text-[10px] text-slate-500 tracking-[0.2em] uppercase font-special-elite">{item.label}</span>
+                                <span className="text-[10px] text-blood/70 tracking-[0.2em] uppercase font-bold">{item.label}</span>
                             </div>
                         ))}
-                    </div>
+                    </motion.div>
 
-                    <div className="flex flex-col md:flex-row gap-6 w-full max-w-xl">
-                        <Link to="/rahasya/booking" className="flex-1">
-                            <button className="w-full bg-blood hover:bg-red-700 text-white py-4 px-8 font-bold tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] clip-path-slanted font-special-elite">
-                                JOIN INVESTIGATION
+                    <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-8 w-full max-w-2xl">
+                        <Link to="/rahasya/booking" className="flex-1 group">
+                            <button className="w-full bg-blood hover:bg-black hover:text-blood border-2 border-transparent hover:border-blood text-white py-5 px-8 font-bold tracking-[0.2em] uppercase transition-all shadow-[0_0_30px_rgba(220,38,38,0.5)] hover:shadow-[0_0_50px_rgba(220,38,38,0.8)] clip-path-slanted font-special-elite text-lg relative overflow-hidden">
+                                <span className="relative z-10">INITIALIZE UPLINK</span>
                             </button>
                         </Link>
                         <Link to="/rahasya/events" className="flex-1">
-                            <button className="w-full bg-transparent hover:bg-white/5 text-white border border-slate-600 py-4 px-8 font-bold tracking-widest uppercase transition-all font-special-elite">
-                                VIEW CASE FILES
+                            <button className="w-full bg-black/50 hover:bg-white/10 text-slate-300 border-2 border-slate-600 border-b-[6px] hover:border-white py-5 px-8 font-bold tracking-[0.2em] uppercase transition-all font-special-elite text-lg relative z-10 group-hover:text-white">
+                                ACCESS EVIDENCE
                             </button>
                         </Link>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </section>
 
             {/* Scrolling Strip */}
-            <div className="bg-caution-tape py-3 overflow-hidden relative border-y-4 border-black">
+            <div className="bg-black pb-3 pt-[22px] overflow-hidden relative border-y-4 border-blood mt-[35px] rotate-1 scale-105 shadow-2xl z-20">
                 <div className="flex whitespace-nowrap animate-marquee">
                     {[...Array(5)].map((_, i) => (
-                        <span key={i} className="mx-4 text-black font-bold text-sm tracking-widest uppercase flex items-center font-special-elite">
+                        <span key={i} className="mx-4 text-blood font-bold text-sm tracking-widest uppercase flex items-center font-special-elite">
                             /// BREAKING NEWS: CAMPUS LOCKDOWN INITIATED /// SUSPECT AT LARGE IN SERVER ROOM /// PREPARE FOR ENCRYPTION PROTOCOLS
                         </span>
                     ))}
@@ -99,35 +149,50 @@ export const RahasyaHome: React.FC = () => {
             </div>
 
             {/* Info Cards */}
-            <section className="bg-noir-900 py-20 border-b border-slate-800">
+            <section className="bg-noir-900 py-20 border-b border-slate-800 relative z-10">
                 <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-slate-800 border border-slate-800 bg-black/20">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Card 1 */}
-                        <div className="p-10 group hover:bg-slate-900/50 transition-colors relative overflow-hidden">
-                            <div className="absolute left-0 top-10 bottom-10 w-1 bg-blood transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                            <Calendar className="w-10 h-10 text-blood mb-6" />
-                            <h3 className="text-xl font-bold text-white mb-2 font-special-elite uppercase tracking-wider">DATE OF INCIDENT</h3>
-                            <p className="text-slate-400 mb-4 font-typewriter">October 15-17, 2026</p>
-                            <p className="text-xs text-slate-600 uppercase tracking-widest font-special-elite">Mark your calendar timeline.</p>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                            className="p-10 bg-black/40 border border-slate-800 hover:border-blood transition-all group relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-blood/5 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                            <Calendar className="w-12 h-12 text-blood mb-6 relative z-10" />
+                            <h3 className="text-xl font-bold text-white mb-2 font-special-elite uppercase tracking-wider relative z-10">DATE OF INCIDENT</h3>
+                            <p className="text-slate-400 mb-4 font-typewriter relative z-10">October 15-17, 2026</p>
+                        </motion.div>
 
                         {/* Card 2 */}
-                        <div className="p-10 group hover:bg-slate-900/50 transition-colors relative overflow-hidden">
-                            <div className="absolute left-0 top-10 bottom-10 w-1 bg-caution-tape transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                            <MapPin className="w-10 h-10 text-yellow-500 mb-6" />
-                            <h3 className="text-xl font-bold text-white mb-2 font-special-elite uppercase tracking-wider">CRIME SCENE</h3>
-                            <p className="text-slate-400 mb-4 font-typewriter">University Main Campus</p>
-                            <p className="text-xs text-slate-600 uppercase tracking-widest font-special-elite">Sector 7, Tech Block.</p>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2 }}
+                            className="p-10 bg-black/40 border border-slate-800 hover:border-yellow-500 transition-all group relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-yellow-500/5 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                            <MapPin className="w-12 h-12 text-yellow-500 mb-6 relative z-10" />
+                            <h3 className="text-xl font-bold text-white mb-2 font-special-elite uppercase tracking-wider relative z-10">CRIME SCENE</h3>
+                            <p className="text-slate-400 mb-4 font-typewriter relative z-10">University Main Campus</p>
+                        </motion.div>
 
                         {/* Card 3 */}
-                        <div className="p-10 group hover:bg-slate-900/50 transition-colors relative overflow-hidden">
-                            <div className="absolute left-0 top-10 bottom-10 w-1 bg-white transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                            <Clock className="w-10 h-10 text-white mb-6" />
-                            <h3 className="text-xl font-bold text-white mb-2 font-special-elite uppercase tracking-wider">DURATION</h3>
-                            <p className="text-slate-400 mb-4 font-typewriter">72 Hours Non-Stop</p>
-                            <p className="text-xs text-slate-600 uppercase tracking-widest font-special-elite">Sleep is for the innocent.</p>
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 }}
+                            className="p-10 bg-black/40 border border-slate-800 hover:border-white transition-all group relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-white/5 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                            <Clock className="w-12 h-12 text-white mb-6 relative z-10" />
+                            <h3 className="text-xl font-bold text-white mb-2 font-special-elite uppercase tracking-wider relative z-10">DURATION</h3>
+                            <p className="text-slate-400 mb-4 font-typewriter relative z-10">72 Hours Non-Stop</p>
+                        </motion.div>
                     </div>
                 </div>
             </section>

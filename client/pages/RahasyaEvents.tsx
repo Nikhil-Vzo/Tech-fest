@@ -1,168 +1,108 @@
 import React, { useState } from 'react';
-import { Lock, Shield, Terminal, Mic, Eye, Database, ChevronRight } from 'lucide-react';
-
-const CASE_FILES = [
-    {
-        id: '001',
-        title: 'Hack The Mainframe',
-        time: '10:00 AM',
-        day: 'DAY 1',
-        category: 'CODE BREAKING',
-        description: 'A 24-hour coding marathon. Crack the secure server before time runs out.',
-        icon: Lock,
-        color: 'text-yellow-500'
-    },
-    {
-        id: '002',
-        title: 'Drone Forensics',
-        time: '02:00 PM',
-        day: 'DAY 1',
-        category: 'FORENSICS',
-        description: 'Analyze flight paths and recover data from crashed drones.',
-        icon: Database,
-        color: 'text-yellow-500'
-    },
-    {
-        id: '003',
-        title: 'The Dark Web Seminar',
-        time: '11:00 AM',
-        day: 'DAY 2',
-        category: 'TRAINING',
-        description: 'Expert session on cybersecurity threats lurking in the shadows.',
-        icon: Mic,
-        color: 'text-red-500' // Red border/glow in screenshot
-    },
-    {
-        id: '004',
-        title: 'Capture The Flag',
-        time: '01:00 PM',
-        day: 'DAY 2',
-        category: 'CYBER CRIMES',
-        description: 'Penetration testing competition. Find the flags, claim the bounty.',
-        icon: Shield,
-        color: 'text-yellow-500'
-    },
-    {
-        id: '005',
-        title: 'The Final Verdict',
-        time: '05:00 PM',
-        day: 'DAY 3',
-        category: 'INTERROGATION',
-        description: 'Closing ceremony and awards distribution for top investigators.',
-        icon: Eye, // Mask icon replacement
-        color: 'text-yellow-500'
-    },
-    {
-        id: '006',
-        title: 'Cold Case Solved',
-        time: '02:00 PM',
-        day: 'DAY 3',
-        category: 'UNDERCOVER',
-        description: 'Panel discussion with industry experts on resolving impossible cases.',
-        icon: Terminal,
-        color: 'text-yellow-500'
-    }
-];
-
-const CATEGORIES = ['ALL', 'CODE BREAKING', 'FORENSICS', 'INTERROGATION', 'CYBER CRIMES', 'UNDERCOVER', 'TRAINING'];
+import { motion } from 'framer-motion';
+import { RahasyaCanvas } from '../components/RahasyaCanvas';
+import { SmoothScroll } from '../components/SmoothScroll';
+import { RAHASYA_EVENTS } from '../constants';
+import { Calendar, MapPin, Search } from 'lucide-react';
 
 export const RahasyaEvents: React.FC = () => {
-    const [activeCategory, setActiveCategory] = useState('ALL');
-
-    const filteredFiles = activeCategory === 'ALL'
-        ? CASE_FILES
-        : CASE_FILES.filter(file => file.category === activeCategory);
+    const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
 
     return (
-        <div className="min-h-screen bg-noir-900 text-slate-300 font-mono py-20">
-            <div className="container mx-auto px-4">
+        <div className="min-h-screen bg-noir-900 text-slate-300 font-mono overflow-hidden">
+            <SmoothScroll />
+            <RahasyaCanvas />
 
+            <div className="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-30 pointer-events-none z-0"></div>
+
+            <div className="relative z-10 pt-4 pb-20 container mx-auto px-4 max-w-7xl">
                 {/* Header */}
-                <div className="text-center mb-16">
-                    <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 font-special-elite tracking-tighter">CASE FILES</h1>
-                    <div className="inline-block bg-blood/10 border border-blood px-4 py-1">
-                        <span className="text-blood font-bold tracking-[0.3em] text-sm uppercase font-special-elite">CLASSIFIED EVIDENCE</span>
+                <motion.header
+                    className="mb-16 border-b-2 border-slate-800 pb-6 flex justify-between items-end"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                >
+                    <div>
+                        <h5 className="text-blood font-bold tracking-[0.5em] text-xs mb-2">EVIDENCE LOG</h5>
+                        <h1 className="text-6xl md:text-8xl font-special-elite text-white uppercase leading-none">
+                            CASE <span className="text-transparent bg-clip-text bg-gradient-to-br from-blood to-red-900">FILES</span>
+                        </h1>
                     </div>
-                </div>
+                    <div className="hidden md:block text-right font-special-elite text-xs text-slate-500">
+                        <p>TOTAL RECORDS: {RAHASYA_EVENTS.length}</p>
+                        <p>CLEARANCE REQ: LEVEL 3</p>
+                    </div>
+                </motion.header>
 
-                {/* Filters */}
-                <div className="flex flex-wrap justify-center gap-4 mb-16">
-                    {CATEGORIES.map(category => (
-                        <button
-                            key={category}
-                            onClick={() => setActiveCategory(category)}
-                            className={`px-6 py-2 text-xs font-bold tracking-widest uppercase border transition-all ${activeCategory === category
-                                ? 'bg-blood border-blood text-white shadow-[0_0_15px_rgba(220,38,38,0.5)]'
-                                : 'bg-transparent border-slate-700 text-slate-500 hover:border-slate-500 hover:text-slate-300'
-                                }`}
+                {/* Events Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {RAHASYA_EVENTS.map((event, index) => (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: index * 0.1, duration: 0.5 }}
+                            className="group relative bg-black border border-slate-800 hover:border-blood transition-all duration-300 h-[400px] flex flex-col overflow-hidden"
+                            onMouseEnter={() => setHoveredEvent(index)}
+                            onMouseLeave={() => setHoveredEvent(null)}
                         >
-                            {category}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredFiles.map((file) => (
-                        <div
-                            key={file.id}
-                            className={`bg-black/40 border ${file.id === '003' ? 'border-blood/50 shadow-[0_0_20px_rgba(220,38,38,0.1)]' : 'border-slate-800'} p-6 relative group hover:bg-slate-900/80 transition-all`}
-                        >
-                            {/* Tag */}
-                            <div className={`absolute -top-3 -right-3 px-3 py-1 text-[10px] font-bold tracking-widest uppercase transform rotate-2 shadow-lg ${file.id === '003' ? 'bg-blood text-white' : 'bg-yellow-500 text-black'}`}>
-                                EVIDENCE #{file.id}
+                            {/* Tape Overlay */}
+                            <div className="absolute top-4 -right-8 w-32 h-6 bg-yellow-600/80 transform rotate-45 flex items-center justify-center text-[10px] text-black font-bold z-20 shadow-md">
+                                EVID-{String(index + 1).padStart(3, '0')}
                             </div>
 
-                            <div className="flex justify-between items-start mb-6">
-                                <div className={`p-3 rounded-full bg-slate-800/50 ${file.color}`}>
-                                    <file.icon className="w-6 h-6" />
+                            {/* Image Section */}
+                            <div className="h-48 overflow-hidden relative border-b border-slate-800">
+                                <img
+                                    src={event.image || `https://source.unsplash.com/random/800x600?cyberpunk,tech&sig=${index}`}
+                                    alt={event.title}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale"
+                                />
+                                <div className="absolute inset-0 bg-blood/10 group-hover:bg-transparent transition-colors"></div>
+                                {/* Scanline */}
+                                <div className="absolute inset-0 bg-scanline opacity-20 pointer-events-none"></div>
+                            </div>
+
+                            {/* Content Section */}
+                            <div className="p-6 flex-1 flex flex-col justify-between relative">
+                                <div>
+                                    <h3 className="text-2xl font-special-elite text-white mb-2 group-hover:text-blood transition-colors">
+                                        {event.title}
+                                    </h3>
+                                    <p className="text-xs text-slate-500 font-mono mb-4 line-clamp-3 leading-relaxed">
+                                        {hoveredEvent === index ? event.description :
+                                            // Redacted effect for description when not hovered
+                                            event.description.split(' ').map(word =>
+                                                Math.random() > 0.5 ? '█'.repeat(word.length) : word
+                                            ).join(' ')
+                                        }
+                                    </p>
                                 </div>
-                                <span className="text-xs text-slate-600 font-bold tracking-widest uppercase">{file.day}</span>
-                            </div>
 
-                            <h3 className={`text-xl font-bold mb-2 ${file.id === '003' ? 'text-blood' : 'text-white'}`}>{file.title}</h3>
+                                <div className="space-y-2 border-t border-slate-800 pt-4 text-xs font-mono text-slate-400">
+                                    <div className="flex items-center gap-2">
+                                        <Calendar className="w-3 h-3 text-blood" />
+                                        <span>{event.time}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="w-3 h-3 text-blood" />
+                                        <span>{event.venue}</span>
+                                    </div>
+                                </div>
 
-                            <div className="flex items-center text-xs text-slate-500 mb-4 font-bold tracking-wider uppercase">
-                                <Clock className="w-3 h-3 mr-2" />
-                                {file.time}
-                            </div>
-
-                            <p className="text-sm text-slate-400 leading-relaxed mb-8 border-t border-slate-800/50 pt-4">
-                                {file.description}
-                            </p>
-
-                            <div className="flex justify-between items-end">
-                                <span className="text-[10px] text-blood font-bold tracking-widest uppercase">CONFIDENTIAL</span>
-                                <button className="text-xs text-slate-500 hover:text-white flex items-center transition-colors group-hover:translate-x-1 duration-300">
-                                    Read File <ChevronRight className="w-3 h-3 ml-1" />
+                                <button className="mt-4 w-full border border-slate-700 hover:bg-blood hover:text-black hover:border-blood text-white py-2 text-xs font-bold tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2">
+                                    <Search className="w-3 h-3" /> ACCESS FILE
                                 </button>
                             </div>
-                        </div>
+
+                            {/* Corner Accents */}
+                            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-slate-600 group-hover:border-blood transition-colors"></div>
+                            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-slate-600 group-hover:border-blood transition-colors"></div>
+                        </motion.div>
                     ))}
                 </div>
-
             </div>
         </div>
     );
 };
-
-// Helper component for the Clock icon since it was missing in imports
-function Clock({ className }: { className?: string }) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={className}
-        >
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="12 6 12 12 16 14" />
-        </svg>
-    );
-}

@@ -31,8 +31,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       {/* Navigation */}
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isRahasya
-        ? 'bg-noir-900/95 border-b border-slate-800 backdrop-blur-md top-2'
-        : 'bg-bollywood-900/90 border-b border-drama backdrop-blur-md top-2'
+        ? 'bg-noir-900/95 border-b border-slate-800 backdrop-blur-md top-0'
+        : 'bg-bollywood-900/90 border-b border-drama backdrop-blur-md top-0'
         }`}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
@@ -96,6 +96,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               {isRahasya ? (
                 <>
                   <Link to="/rahasya" className="hover:text-blood">HOME</Link>
+                  <Link to="/rahasya/about" className="hover:text-blood">ABOUT</Link>
+                  <Link to="/rahasya/timeline" className="hover:text-blood">TIMELINE</Link>
                   <Link to="/rahasya/events" className="hover:text-blood">EVIDENCE</Link>
                   <Link to="/rahasya/booking" className="hover:text-blood">PERMITS</Link>
                   <Link to="/" className="text-blood font-bold mt-4 border border-blood p-2 inline-block mx-auto">EXIT INVESTIGATION</Link>
