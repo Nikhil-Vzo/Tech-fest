@@ -71,6 +71,8 @@ export const Home: React.FC = () => {
             <img
               src="https://i.ibb.co/fz6gHG0L/Untitled-design-removebg-preview.png"
               alt="AMISPARK x RAHASYA"
+              fetchPriority="high"
+              loading="eager"
               className="w-full max-w-3xl h-auto object-contain drop-shadow-[0_0_25px_rgba(255,255,255,0.1)] filter brightness-110 contrast-125"
             />
           </div>

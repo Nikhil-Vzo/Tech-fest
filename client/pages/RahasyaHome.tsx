@@ -57,16 +57,16 @@ export const RahasyaHome: React.FC = () => {
         <div className="min-h-screen bg-noir-900 text-slate-300 font-mono selection:bg-blood selection:text-white overflow-hidden">
             <SmoothScroll />
 
-            {/* 3D Background Layer */}
-            <RahasyaCanvas />
-
             {/* Hero Section */}
             <section className="relative min-h-screen h-auto flex flex-col items-center justify-start overflow-hidden pt-0 -mt-2 pb-32">
                 {/* Fallback Background for reliability + Blend */}
                 <div
-                    className="absolute inset-0 bg-cover bg-center opacity-20 z-0 transition-opacity duration-1000"
+                    className="absolute inset-0 bg-cover bg-center opacity-10 z-0 transition-opacity duration-1000"
                     style={{ backgroundImage: `url('${bgImage}')` }}
                 />
+
+                {/* 3D Background Layer - Moved here to sit ON TOP of bg image but BEHIND content */}
+                <RahasyaCanvas />
 
                 {/* Visual Effects Overlays */}
                 <div className="absolute inset-0 bg-scanline z-0 pointer-events-none opacity-30 mix-blend-overlay" />

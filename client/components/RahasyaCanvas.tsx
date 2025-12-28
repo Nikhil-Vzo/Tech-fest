@@ -33,7 +33,7 @@ const RotatingCyberObject = () => {
     });
 
     return (
-        <mesh ref={meshRef}>
+        <mesh ref={meshRef} position={[0, 1.0, 0]}>
             <icosahedronGeometry args={[1, 1]} />
             <meshBasicMaterial wireframe color="#dc2626" />
         </mesh>
@@ -43,7 +43,7 @@ const RotatingCyberObject = () => {
 export const RahasyaCanvas = () => {
     return (
         <div className="absolute inset-0 z-0 pointer-events-none">
-            <Canvas>
+            <Canvas dpr={[1, 1.5]}>
                 <PerspectiveCamera makeDefault position={[0, 0, 5]} />
                 <ambientLight intensity={0.5} />
 

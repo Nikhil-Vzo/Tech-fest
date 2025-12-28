@@ -174,11 +174,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <Link to="/tickets" className="bg-gradient-to-r from-drama to-drama-dark text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all mt-2 w-auto min-w-[200px] mx-auto">
                     BOOK TICKETS
                   </Link>
-                  <Link to="/rahasya" className="font-mono font-bold text-blood border-2 border-blood bg-black py-3 px-6 rounded-sm shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:bg-blood hover:text-white transition-all tracking-[0.2em] transform hover:-translate-y-1 mt-4 w-auto min-w-[200px] mx-auto text-lg" onClick={(e) => {
-                    e.preventDefault();
-                    setIsFading(true);
-                    setTimeout(() => navigate('/rahasya'), 500);
-                  }}>
+                  <Link to="/rahasya" className="font-mono font-bold text-blood border-2 border-blood bg-black py-3 px-6 rounded-sm shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:bg-blood hover:text-white transition-all tracking-[0.2em] transform hover:-translate-y-1 mt-4 w-auto min-w-[200px] mx-auto text-lg">
                     RAहस्य_ENTER
                   </Link>
                 </>

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Ticket, Users, CreditCard, Check, AlertCircle, Lock, Upload } from 'lucide-react';
 import { Button, Input, Card } from '../components/UIComponents';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CHHATTISGARH_COLLEGES } from '../constants';
 
 // Ticket Tiers Data
@@ -40,7 +40,7 @@ const attendeeSchema = z.object({
     lastName: z.string().min(1, "Last Name is required"),
     email: z.string().email("Invalid email address"),
     phone: z.string().min(10, "Phone number must be at least 10 digits"),
-    gender: z.enum(["Male", "Female", "Other"], { errorMap: () => ({ message: "Please select a gender" }) }),
+    gender: z.enum(["Male", "Female", "Other"], { message: "Please select a gender" }),
     college: z.string().min(1, "Please select a college"),
 });
 
@@ -48,6 +48,7 @@ type AttendeeFormData = z.infer<typeof attendeeSchema>;
 
 export const Booking: React.FC = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const isRahasya = location.pathname.includes('/rahasya');
     const TICKET_TIERS = isRahasya ? NOIR_TIERS : BOLLYWOOD_TIERS;
 
@@ -276,7 +277,7 @@ export const Booking: React.FC = () => {
                                             Direct booking is not available in this sector. Please proceed to the main terminal for authorization.
                                         </p>
                                         <Button
-                                            onClick={() => window.location.href = '/booking'}
+                                            onClick={() => navigate('/tickets')}
                                             variant="primary"
                                             className="bg-blood hover:bg-red-700 text-white px-8 py-3"
                                         >
