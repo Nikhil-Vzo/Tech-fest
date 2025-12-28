@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Instagram, Twitter, Facebook, Sparkles, Search, FileText, MessageCircle } from 'lucide-react';
+import { Menu, X, Instagram, Twitter, Facebook, Sparkles, Search, FileText, MessageCircle, MapPin } from 'lucide-react';
 import { ThemeTransition } from './ThemeTransition';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -195,65 +195,85 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </div>
         </footer>
       ) : (
-        // Amispark Footer (Original)
-        <footer className="bg-bollywood-800 border-t-4 border-bollywood-700 relative mt-20">
-          <div className="absolute top-0 left-0 w-full h-1 bg-festive-pattern"></div>
-          <div className="container mx-auto px-4 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        // Amispark Premium Footer
+        <footer className="bg-gradient-to-t from-bollywood-900 to-drama-dark border-t-4 border-glitz-gold relative mt-12 text-glitz-paper">
+          {/* Curtain Effect Decor */}
+          <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180 -mt-1">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-[calc(100%+1.3px)] h-[50px] fill-drama">
+              <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"></path>
+            </svg>
+          </div>
 
-              <div className="col-span-1 md:col-span-2">
-                <h3 className="font-display text-2xl text-white mb-4">FESTIVAL HIGHLIGHTS</h3>
-                <p className="text-glitz-paper/80 max-w-md mb-6 leading-relaxed">
-                  AMISPARK 2026 represents the pinnacle of Bollywood celebration and cultural extravaganza.
-                  Join us to experience the magic, music, and magnificence of India's greatest cultural festival.
+          <div className="container mx-auto px-4 pt-16 pb-8">
+            <div className="flex flex-col items-center text-center mb-8">
+              <Sparkles className="w-10 h-10 text-glitz-gold mb-3 animate-spin-slow" />
+              <h2 className="text-3xl md:text-5xl font-display text-transparent bg-clip-text bg-gradient-to-r from-glitz-gold via-white to-glitz-gold mb-3 tracking-tighter">
+                AMISPARK 2026
+              </h2>
+              <p className="max-w-2xl text-base text-glitz-paper/80 font-light italic">
+                "Where the magic of cinema meets the spirit of youth."
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 border-t border-white/10 pt-8">
+              <div className="md:col-span-2 text-left">
+                <h3 className="font-display text-xl text-white mb-4">STAY CONNECTED</h3>
+                <p className="mb-6 leading-relaxed opacity-90 text-sm">
+                  Follow us for exclusive behind-the-scenes content, artist reveals, and daily updates. Be the star of your own story.
                 </p>
-                <div className="flex gap-4">
-                  {['twitter', 'instagram', 'linkedin'].map(social => (
-                    <div key={social} className="w-10 h-10 bg-bollywood-700 rounded-full flex items-center justify-center hover:bg-drama cursor-pointer transition-colors">
-                      <span className="sr-only">{social}</span>
-                      <Search className="w-4 h-4" />
-                    </div>
+                <div className="flex gap-4 justify-start">
+                  {[
+                    { icon: Instagram, color: "hover:bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500" },
+                    { icon: Twitter, color: "hover:bg-blue-400" },
+                    { icon: Facebook, color: "hover:bg-blue-600" }
+                  ].map((social, idx) => (
+                    <a key={idx} href="#" className={`w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white transition-all transform hover:-translate-y-2 hover:shadow-lg ${social.color}`}>
+                      <social.icon className="w-5 h-5" />
+                    </a>
                   ))}
                 </div>
               </div>
 
               <div>
-                <h4 className="font-bold text-glitz-gold mb-4 tracking-wider">QUICK LINKS</h4>
-                <ul className="space-y-2 text-sm text-glitz-paper/70">
-                  <li><Link to="/about" className="hover:text-drama transition-colors">About Us</Link></li>
-                  <li><Link to="/schedule" className="hover:text-drama transition-colors">Schedule</Link></li>
-                  <li><Link to="/gallery" className="hover:text-drama transition-colors">Gallery</Link></li>
-                  <li><Link to="/tickets" className="hover:text-drama transition-colors">Book Tickets</Link></li>
+                <h4 className="font-bold text-glitz-gold mb-4 tracking-widest text-xs">QUICK LINKS</h4>
+                <ul className="space-y-2 text-sm text-glitz-paper/80 font-medium">
+                  <li><Link to="/about" className="hover:text-drama-light transition-colors flex items-center"><span className="w-1.5 h-1.5 bg-glitz-gold rounded-full mr-2"></span> About Us</Link></li>
+                  <li><Link to="/schedule" className="hover:text-drama-light transition-colors flex items-center"><span className="w-1.5 h-1.5 bg-glitz-gold rounded-full mr-2"></span> Schedule</Link></li>
+                  <li><Link to="/gallery" className="hover:text-drama-light transition-colors flex items-center"><span className="w-1.5 h-1.5 bg-glitz-gold rounded-full mr-2"></span> Gallery</Link></li>
+                  <li><Link to="/tickets" className="hover:text-drama-light transition-colors flex items-center"><span className="w-1.5 h-1.5 bg-glitz-gold rounded-full mr-2"></span> Book Tickets</Link></li>
                 </ul>
               </div>
 
               <div>
-                <h4 className="font-bold text-glitz-gold mb-4 tracking-wider">CONTACT</h4>
-                <ul className="space-y-2 text-sm text-glitz-paper/70">
-                  <li>Amity University</li>
-                  <li>Sector 125, Noida</li>
-                  <li>contact@amispark.com</li>
-                  <li>+91 98765 43210</li>
+                <h4 className="font-bold text-glitz-gold mb-4 tracking-widest text-xs">CONTACT INFO</h4>
+                <ul className="space-y-2 text-sm text-glitz-paper/80">
+                  <li className="flex items-start"><MapPin className="w-4 h-4 mr-3 text-drama-light shrink-0" /> Amity University<br />Sector 125, Noida</li>
+                  <li className="flex items-center"><FileText className="w-4 h-4 mr-3 text-drama-light shrink-0" /> contact@amispark.com</li>
+                  <li className="flex items-center"><MessageCircle className="w-4 h-4 mr-3 text-drama-light shrink-0" /> +91 98765 43210</li>
                 </ul>
               </div>
-
             </div>
 
             {/* WhatsApp Contact */}
-            <div className="mt-12 text-center">
+            <div className="mt-10 text-center">
               <a
                 href="https://wa.me/919098893505"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-drama hover:bg-drama-light text-white px-8 py-4 rounded-full font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border border-glitz-gold/30 group"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-drama to-purple-600 hover:from-drama-light hover:to-purple-500 text-white px-8 py-3 rounded-full font-bold shadow-[0_10px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_15px_30px_rgba(139,92,246,0.4)] transition-all transform hover:-translate-y-1 border border-white/20 group text-sm"
               >
-                <MessageCircle className="w-5 h-5 group-hover:animate-bounce" />
-                Contact Us on WhatsApp
+                <MessageCircle className="w-5 h-5" />
+                <span>Chat on WhatsApp</span>
+                <span className="bg-white/20 rounded-full px-2 py-0.5 text-[10px] ml-1">24/7</span>
               </a>
             </div>
 
-            <div className="border-t border-bollywood-700 mt-12 pt-8 text-center text-sm text-glitz-paper/40">
-              <p>&copy; 2026 Amity University. All rights reserved.</p>
+            <div className="border-t border-white/10 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-[10px] text-glitz-paper/40 tracking-wider">
+              <p>&copy; 2026 AMISPARK. All rights reserved.</p>
+              <div className="space-x-4 mt-2 md:mt-0">
+                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              </div>
             </div>
           </div>
         </footer>

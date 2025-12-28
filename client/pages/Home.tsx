@@ -103,28 +103,92 @@ export const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Details */}
-      <section className="py-20 bg-bollywood-900 container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-bollywood-800 p-8 border-l-4 border-drama rounded-r-xl">
-            <Calendar className="w-10 h-10 text-drama mb-4" />
-            <h3 className="text-2xl font-display text-white mb-2">FESTIVAL DATES</h3>
-            <p className="text-glitz-paper/80">February 17-19, 2026</p>
-            <p className="text-drama-light text-sm mt-2">Mark your calendar!</p>
+
+
+      {/* Quick Details - Premium Revamp */}
+      <section className="py-24 bg-bollywood-900 container mx-auto px-4 relative">
+        {/* Background Decor */}
+        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-drama opacity-20 blur-3xl rounded-full pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-glitz-gold opacity-10 blur-3xl rounded-full pointer-events-none"></div>
+
+        <h2 className="text-4xl md:text-5xl font-display text-center text-transparent bg-clip-text bg-gradient-to-r from-glitz-gold via-white to-glitz-gold mb-16 drop-shadow-md">
+          THE GRAND PREMIERE
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Card 1: Dates */}
+          <div className="group relative bg-bollywood-800 rounded-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 shadow-xl hover:shadow-2xl border border-white/5">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-drama to-glitz-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+            <div className="p-8 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-bollywood-700/50 flex items-center justify-center mb-6 group-hover:bg-drama/20 transition-colors">
+                <Calendar className="w-8 h-8 text-glitz-gold group-hover:text-drama-light transition-colors" />
+              </div>
+              <h3 className="text-2xl font-display text-white mb-2 tracking-wide">SHOW DATES</h3>
+              <p className="text-glitz-paper/80 font-medium text-lg">February 17-19, 2026</p>
+              <div className="mt-4 w-12 h-0.5 bg-white/20 group-hover:w-full transition-all duration-500"></div>
+              <p className="text-drama-light text-sm mt-4 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">Block your dates!</p>
+            </div>
           </div>
-          <div className="bg-bollywood-800 p-8 border-l-4 border-glitz-gold rounded-r-xl">
-            <MapPin className="w-10 h-10 text-glitz-gold mb-4" />
-            <h3 className="text-2xl font-display text-white mb-2">VENUE</h3>
-            <p className="text-glitz-paper/80">University Main Campus</p>
-            <p className="text-glitz-gold/80 text-sm mt-2">Amity University Chhattisgarh, Raipur</p>
+
+          {/* Card 2: Venue */}
+          <div className="group relative bg-bollywood-800 rounded-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 shadow-xl hover:shadow-2xl border border-white/5">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-glitz-gold to-drama transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+            <div className="p-8 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-bollywood-700/50 flex items-center justify-center mb-6 group-hover:bg-glitz-gold/20 transition-colors">
+                <MapPin className="w-8 h-8 text-drama-light group-hover:text-glitz-gold transition-colors" />
+              </div>
+              <h3 className="text-2xl font-display text-white mb-2 tracking-wide">THE STAGE</h3>
+              <p className="text-glitz-paper/80 font-medium text-lg">University Main Campus</p>
+              <div className="mt-4 w-12 h-0.5 bg-white/20 group-hover:w-full transition-all duration-500"></div>
+              <p className="text-glitz-gold text-sm mt-4 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">Raipur, Chhattisgarh</p>
+            </div>
           </div>
-          <div className="bg-bollywood-800 p-8 border-l-4 border-white rounded-r-xl">
-            <Clock className="w-10 h-10 text-white mb-4" />
-            <h3 className="text-2xl font-display text-white mb-2">DURATION</h3>
-            <p className="text-glitz-paper/80">3 Days of Fun</p>
-            <p className="text-glitz-paper/60 text-sm mt-2">Non-stop entertainment.</p>
+
+          {/* Card 3: Duration */}
+          <div className="group relative bg-bollywood-800 rounded-xl overflow-hidden transform hover:-translate-y-2 transition-all duration-300 shadow-xl hover:shadow-2xl border border-white/5">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-drama to-glitz-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+            <div className="p-8 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-bollywood-700/50 flex items-center justify-center mb-6 group-hover:bg-drama/20 transition-colors">
+                <Clock className="w-8 h-8 text-white group-hover:text-drama-light transition-colors" />
+              </div>
+              <h3 className="text-2xl font-display text-white mb-2 tracking-wide">SCREEN TIME</h3>
+              <p className="text-glitz-paper/80 font-medium text-lg">72 Hours Non-Stop</p>
+              <div className="mt-4 w-12 h-0.5 bg-white/20 group-hover:w-full transition-all duration-500"></div>
+              <p className="text-drama-light text-sm mt-4 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">The show never ends.</p>
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* Rahasya CTA - The Glitch */}
+      <section className="relative py-16 bg-black overflow-hidden group cursor-pointer" onClick={() => navigate('/rahasya')}>
+        {/* Background Noise */}
+        <div className="absolute inset-0 opacity-20 bg-static-noise pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black z-10"></div>
+
+        <div className="container mx-auto px-4 relative z-20 flex flex-col md:flex-row items-center justify-between">
+          <div className="text-left md:w-2/3">
+            <h2 className="text-3xl md:text-5xl font-mono text-white font-bold tracking-tighter mb-2 group-hover:text-blood transition-colors duration-300">
+              <span className="inline-block animate-pulse text-blood mr-2">⚠</span>
+              CLASSIFIED_ACCESS
+            </h2>
+            <p className="font-mono text-slate-400 text-sm md:text-base max-w-xl">
+              Unknown signal detected. Origin: Sector 9. Probability of mystery: 100%.
+              <br />
+              <span className="text-blood/70"> {">>"} Do you dare to investigate?</span>
+            </p>
+          </div>
+
+          <div className="mt-8 md:mt-0">
+            <Button className="bg-transparent border-2 border-blood text-blood font-mono hover:bg-blood hover:text-white px-8 py-6 text-lg tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(220,38,38,0.2)] hover:shadow-[0_0_40px_rgba(220,38,38,0.6)] rounded-sm">
+              ENTER_RAहासYA
+            </Button>
+          </div>
+        </div>
+
+        {/* Decorative Lines */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blood to-transparent opacity-50"></div>
+        <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blood to-transparent opacity-50"></div>
       </section>
     </div>
   );
