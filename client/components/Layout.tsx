@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Instagram, Twitter, Facebook, Sparkles, Search, FileText, MessageCircle, MapPin } from 'lucide-react';
 import { ThemeTransition } from './ThemeTransition';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const location = useLocation();
   const isRahasya = location.pathname.includes('/rahasya');
   const [hoverStyle, setHoverStyle] = useState({ left: 0, width: 0, opacity: 0 });
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   // Close menu on route change
   useEffect(() => {
@@ -101,9 +103,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       <Link to="/" className="bg-transparent hover:bg-white/10 text-white border border-white/20 px-4 py-2 text-xs tracking-widest uppercase transition-all">
                         AMISPARK
                       </Link>
-                      <Link to="/rahasya/booking" className="bg-blood hover:bg-red-700 text-white px-6 py-2 rounded-none font-bold text-xs tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] clip-path-slanted">
+                      <button onClick={() => setShowBookingModal(true)} className="bg-blood hover:bg-red-700 text-white px-6 py-2 rounded-none font-bold text-xs tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] clip-path-slanted">
                         BUY TICKETS
-                      </Link>
+                      </button>
                     </div>
                   </>
                 ) : (
@@ -161,7 +163,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <Link to="/rahasya/about" className="hover:text-blood">ABOUT</Link>
                   <Link to="/rahasya/timeline" className="hover:text-blood">TIMELINE</Link>
                   <Link to="/rahasya/events" className="hover:text-blood">EVIDENCE</Link>
-                  <Link to="/rahasya/booking" className="hover:text-blood">BUY TICKETS</Link>
+                  <Link to="/rahasya/events" className="hover:text-blood">EVIDENCE</Link>
+                  <button onClick={() => { setIsMenuOpen(false); setShowBookingModal(true); }} className="hover:text-blood text-center w-full">BUY TICKETS</button>
                   <Link to="/" className="text-blood font-bold mt-4 border border-blood p-2 inline-block mx-auto">EXIT INVESTIGATION</Link>
                 </>
               ) : (
@@ -340,6 +343,53 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </div>
         </footer>
       )}
+
+
+      {/* Redirection Modal used in Layout to cover Navbar triggers */}
+      <AnimatePresence>
+        {showBookingModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-noir-900 border-2 border-blood max-w-lg w-full p-8 relative shadow-[0_0_50px_rgba(220,38,38,0.3)]"
+            >
+              <div className="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-blood -mt-1 -ml-1"></div>
+              <div className="absolute bottom-0 right-0 w-20 h-20 border-b-4 border-r-4 border-blood -mb-1 -mr-1"></div>
+
+              <h2 className="text-2xl md:text-3xl font-special-elite text-white mb-6 tracking-widest text-center border-b border-blood/30 pb-4">
+                ⚠ TRANSMISSION INTERCEPTED
+              </h2>
+
+              <p className="font-mono text-slate-300 mb-8 leading-relaxed text-center">
+                Intelligence Report: <span className="text-blood font-bold">Rahasya</span> events are integrated into the central <span className="text-white font-bold">Amispark Access Pass</span>.
+                <br /><br />
+                You will be redirected to the secure Amispark Booking Terminal. One ticket grants access to both realities.
+              </p>
+
+              <div className="flex flex-col md:flex-row gap-4">
+                <button
+                  onClick={() => setShowBookingModal(false)}
+                  className="flex-1 py-3 border border-slate-600 hover:bg-slate-800 text-slate-400 font-bold tracking-widest uppercase transition-all font-mono"
+                >
+                  ABORT
+                </button>
+                <Link to="/tickets" onClick={() => setShowBookingModal(false)} className="flex-1">
+                  <button className="w-full py-3 bg-blood hover:bg-red-700 text-white font-bold tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] font-mono animate-pulse">
+                    PROCEED
+                  </button>
+                </Link>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

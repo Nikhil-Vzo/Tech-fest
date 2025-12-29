@@ -4,11 +4,12 @@ import { Calendar, MapPin, Clock } from 'lucide-react';
 import { RAHASYA_BACKGROUNDS } from '../constants';
 import { RahasyaCanvas } from '../components/RahasyaCanvas';
 import { SmoothScroll } from '../components/SmoothScroll';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const RahasyaHome: React.FC = () => {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const [bgImage, setBgImage] = useState('');
+    const [showBookingModal, setShowBookingModal] = useState(false);
 
     useEffect(() => {
         const randomBg = RAHASYA_BACKGROUNDS[Math.floor(Math.random() * RAHASYA_BACKGROUNDS.length)];
@@ -123,11 +124,11 @@ export const RahasyaHome: React.FC = () => {
                     </motion.div>
 
                     <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-8 w-full max-w-2xl">
-                        <Link to="/rahasya/booking" className="flex-1 group">
+                        <div onClick={() => setShowBookingModal(true)} className="flex-1 group cursor-pointer">
                             <button className="w-full bg-blood hover:bg-black hover:text-blood border-2 border-transparent hover:border-blood text-white py-5 px-8 font-bold tracking-[0.2em] uppercase transition-all shadow-[0_0_30px_rgba(220,38,38,0.5)] hover:shadow-[0_0_50px_rgba(220,38,38,0.8)] clip-path-slanted font-special-elite text-lg relative overflow-hidden">
                                 <span className="relative z-10">BUY TICKETS</span>
                             </button>
-                        </Link>
+                        </div>
                         <Link to="/rahasya/events" className="flex-1">
                             <button className="w-full bg-black/50 hover:bg-white/10 text-slate-300 border-2 border-slate-600 border-b-[6px] hover:border-white py-5 px-8 font-bold tracking-[0.2em] uppercase transition-all font-special-elite text-lg relative z-10 group-hover:text-white">
                                 ACCESS EVIDENCE
@@ -197,6 +198,53 @@ export const RahasyaHome: React.FC = () => {
                 </div>
             </section>
 
-        </div>
+
+
+            {/* Redirection Modal */}
+            <AnimatePresence>
+                {showBookingModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-noir-900 border-2 border-blood max-w-lg w-full p-8 relative shadow-[0_0_50px_rgba(220,38,38,0.3)]"
+                        >
+                            <div className="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-blood -mt-1 -ml-1"></div>
+                            <div className="absolute bottom-0 right-0 w-20 h-20 border-b-4 border-r-4 border-blood -mb-1 -mr-1"></div>
+
+                            <h2 className="text-2xl md:text-3xl font-special-elite text-white mb-6 tracking-widest text-center border-b border-blood/30 pb-4">
+                                ⚠ TRANSMISSION INTERCEPTED
+                            </h2>
+
+                            <p className="font-mono text-slate-300 mb-8 leading-relaxed text-center">
+                                Intelligence Report: <span className="text-blood font-bold">Rahasya</span> events are integrated into the central <span className="text-white font-bold">Amispark Access Pass</span>.
+                                <br /><br />
+                                You will be redirected to the secure Amispark Booking Terminal. One ticket grants access to both realities.
+                            </p>
+
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <button
+                                    onClick={() => setShowBookingModal(false)}
+                                    className="flex-1 py-3 border border-slate-600 hover:bg-slate-800 text-slate-400 font-bold tracking-widest uppercase transition-all font-mono"
+                                >
+                                    ABORT
+                                </button>
+                                <Link to="/tickets" className="flex-1">
+                                    <button className="w-full py-3 bg-blood hover:bg-red-700 text-white font-bold tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(220,38,38,0.5)] font-mono animate-pulse">
+                                        PROCEED
+                                    </button>
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div >
     );
 };
