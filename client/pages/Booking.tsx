@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -45,6 +45,16 @@ export const Booking: React.FC = () => {
     const [selectedTier, setSelectedTier] = useState<ZoneTier | null>(null);
     const [step, setStep] = useState(1);
     const [accommodation, setAccommodation] = useState(false);
+    const [zoomLevel, setZoomLevel] = useState(1);
+    const gridRef = useRef<HTMLDivElement>(null);
+    const [gridHeight, setGridHeight] = useState<number>(0);
+
+    // Update grid height on mount and zoom
+    useEffect(() => {
+        if (gridRef.current) {
+            setGridHeight(gridRef.current.offsetHeight);
+        }
+    }, [step, zoomLevel]); // Re-measure if step or zoom changes (though offsetHeight shouldn't change with zoom, capturing it initially is key)
 
     // User Data & Verification
     const [userData, setUserData] = useState<AttendeeFormData | null>(null);
@@ -118,9 +128,17 @@ export const Booking: React.FC = () => {
         setVerificationInput('');
     };
 
+    // Zoom Handlers
+    const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.1, 2.0));
+    const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.1, 0.5));
+
     const onUserSubmit = (data: AttendeeFormData) => {
         setUserData(data);
         setStep(2);
+        // Notification for zoom
+        setTimeout(() => {
+            setToast({ message: "Use the Zoom controls (+ / -) to view the full map!", type: 'success' });
+        }, 500);
     };
 
     const calculateTotal = () => {
@@ -220,92 +238,108 @@ export const Booking: React.FC = () => {
                             <Card className={`p-6 ${isRahasya ? 'bg-black/40 border-slate-800' : 'bg-bollywood-800 border-drama'}`}>
                                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><Ticket className="w-5 h-5" /> Select Zone</h2>
 
-                                <div className="relative overflow-x-auto py-4">
-                                    {/* The CSS Grid Visual Map */}
-                                    <div className={`venue-grid ${isRahasya ? 'venue-noir' : 'venue-bollywood'} min-w-[600px] mx-auto`}>
+                                <div className="flex justify-end gap-2 mb-2">
+                                    <Button onClick={handleZoomOut} className="bg-white/10 hover:bg-white/20 px-3 py-1 text-sm font-mono" title="Zoom Out">-</Button>
+                                    <span className="flex items-center text-xs opacity-70 min-w-[60px] justify-center">Zoom: {Math.round(zoomLevel * 100)}%</span>
+                                    <Button onClick={handleZoomIn} className="bg-white/10 hover:bg-white/20 px-3 py-1 text-sm font-mono" title="Zoom In">+</Button>
+                                </div>
 
-                                        {/* DECORATIVE: Stage & Ramp */}
-                                        <div className={`venue-area area-stage-top ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
-                                            <span>{isRahasya ? 'TERMINAL' : 'STAGE'}</span>
-                                        </div>
-                                        <div className={`venue-area area-stage-bottom ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
-                                            <span>{isRahasya ? 'LINK' : 'RAMP'}</span>
-                                        </div>
+                                <div className="relative overflow-x-auto py-4 overflow-y-hidden text-center bg-black/20 rounded-lg border border-white/5" style={{ height: gridHeight ? gridHeight * zoomLevel + 50 : 'auto' }}>
+                                    <div
+                                        style={{
+                                            transform: `scale(${zoomLevel})`,
+                                            transformOrigin: 'top center',
+                                            transition: 'transform 0.2s ease-out',
+                                            display: 'inline-block',
+                                        }}
+                                        ref={gridRef}
+                                    >
+                                        {/* The CSS Grid Visual Map */}
+                                        <div className={`venue-grid ${isRahasya ? 'venue-noir' : 'venue-bollywood'} min-w-[600px] mx-auto`}>
 
-                                        {/* INTERACTIVE 1: TECH BAZAAR (Left) */}
-                                        {(() => {
-                                            const tier = getTier('tech-bazaar');
-                                            const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
+                                            {/* DECORATIVE: Stage & Ramp */}
+                                            <div className={`venue-area area-stage-top ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
+                                                <span>{isRahasya ? 'TERMINAL' : 'STAGE'}</span>
+                                            </div>
+                                            <div className={`venue-area area-stage-bottom ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
+                                                <span>{isRahasya ? 'LINK' : 'RAMP'}</span>
+                                            </div>
 
-                                            return (
-                                                <div
-                                                    className={`venue-area area-techfest ${isRahasya ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-purple-900/40 border-purple-500/30 hover:bg-purple-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
-                                                    onClick={() => handleTierSelect(tier)}
-                                                >
-                                                    <span>{tier?.name || 'Loading...'}</span>
-                                                    <div className="area-info">
-                                                        <p className="font-bold">₹{tier ? tier.base_price + tier.tech_fest_fee : '...'}</p>
-                                                        <p className="text-xs">{tier?.available_seats} Seats</p>
-                                                        {locked && <Lock className="w-4 h-4 mt-1" />}
+                                            {/* INTERACTIVE 1: TECH BAZAAR (Left) */}
+                                            {(() => {
+                                                const tier = getTier('tech-bazaar');
+                                                const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
+
+                                                return (
+                                                    <div
+                                                        className={`venue-area area-techfest ${isRahasya ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-purple-900/40 border-purple-500/30 hover:bg-purple-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                                        onClick={() => handleTierSelect(tier)}
+                                                    >
+                                                        <span>{tier?.name || 'Loading...'}</span>
+                                                        <div className="area-info">
+                                                            <p className="font-bold">₹{tier ? tier.base_price + tier.tech_fest_fee : '...'}</p>
+                                                            <p className="text-xs">{tier?.available_seats} Seats</p>
+                                                            {locked && <Lock className="w-4 h-4 mt-1" />}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })()}
+                                                );
+                                            })()}
 
-                                        {/* DECORATIVE: Faculty (Right - Restricted) */}
-                                        <div className={`venue-area area-faculty ${isRahasya ? 'bg-red-950 border-red-900/50 cursor-not-allowed text-red-800' : 'bg-red-900/40 border-red-500/30 cursor-not-allowed'}`}>
-                                            <span>FACULTY</span>
-                                            <div className="absolute top-2 right-2"><Lock className="w-4 h-4" /></div>
-                                        </div>
+                                            {/* DECORATIVE: Faculty (Right - Restricted) */}
+                                            <div className={`venue-area area-faculty ${isRahasya ? 'bg-red-950 border-red-900/50 cursor-not-allowed text-red-800' : 'bg-red-900/40 border-red-500/30 cursor-not-allowed'}`}>
+                                                <span>FACULTY</span>
+                                                <div className="absolute top-2 right-2"><Lock className="w-4 h-4" /></div>
+                                            </div>
 
-                                        {/* INTERACTIVE 2: STAR CIRCLE (Center) */}
-                                        {(() => {
-                                            const tier = getTier('star-circle');
-                                            const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
+                                            {/* INTERACTIVE 2: STAR CIRCLE (Center) */}
+                                            {(() => {
+                                                const tier = getTier('star-circle');
+                                                const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
 
-                                            return (
-                                                <div
-                                                    className={`venue-area area-fanpit ${isRahasya ? 'bg-black border-slate-600 text-white' : 'bg-pink-900/40 border-pink-500/30 hover:bg-pink-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
-                                                    onClick={() => handleTierSelect(tier)}
-                                                >
-                                                    <span>{tier?.name || 'Loading...'}</span>
-                                                    <div className="area-info">
-                                                        <p className="font-bold">₹{tier ? tier.base_price + tier.tech_fest_fee : '...'}</p>
-                                                        <p className="text-xs">{tier?.available_seats} Seats</p>
-                                                        {locked && <Lock className="w-4 h-4 mt-1" />}
+                                                return (
+                                                    <div
+                                                        className={`venue-area area-fanpit ${isRahasya ? 'bg-black border-slate-600 text-white' : 'bg-pink-900/40 border-pink-500/30 hover:bg-pink-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                                        onClick={() => handleTierSelect(tier)}
+                                                    >
+                                                        <span>{tier?.name || 'Loading...'}</span>
+                                                        <div className="area-info">
+                                                            <p className="font-bold">₹{tier ? tier.base_price + tier.tech_fest_fee : '...'}</p>
+                                                            <p className="text-xs">{tier?.available_seats} Seats</p>
+                                                            {locked && <Lock className="w-4 h-4 mt-1" />}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })()}
+                                                );
+                                            })()}
 
-                                        {/* INTERACTIVE 3: GENERAL ACCESS (Bottom) */}
-                                        {(() => {
-                                            const tier = getTier('general-access');
-                                            const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
+                                            {/* INTERACTIVE 3: GENERAL ACCESS (Bottom) */}
+                                            {(() => {
+                                                const tier = getTier('general-access');
+                                                const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
 
-                                            return (
-                                                <div
-                                                    className={`venue-area area-general ${isRahasya ? 'bg-slate-800 border-slate-600 text-slate-400' : 'bg-indigo-900/40 border-indigo-500/30 hover:bg-indigo-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
-                                                    onClick={() => handleTierSelect(tier)}
-                                                >
-                                                    <span>{tier?.name || 'Loading...'}</span>
-                                                    <div className="area-info">
-                                                        <p className="font-bold">₹{tier ? tier.base_price + tier.tech_fest_fee : '...'}</p>
-                                                        <p className="text-xs">{tier?.available_seats} Seats</p>
-                                                        {locked && <Lock className="w-4 h-4 mt-1" />}
+                                                return (
+                                                    <div
+                                                        className={`venue-area area-general ${isRahasya ? 'bg-slate-800 border-slate-600 text-slate-400' : 'bg-indigo-900/40 border-indigo-500/30 hover:bg-indigo-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                                        onClick={() => handleTierSelect(tier)}
+                                                    >
+                                                        <span>{tier?.name || 'Loading...'}</span>
+                                                        <div className="area-info">
+                                                            <p className="font-bold">₹{tier ? tier.base_price + tier.tech_fest_fee : '...'}</p>
+                                                            <p className="text-xs">{tier?.available_seats} Seats</p>
+                                                            {locked && <Lock className="w-4 h-4 mt-1" />}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })()}
+                                                );
+                                            })()}
 
-                                        {/* DECORATIVE: Food & DJ */}
-                                        <div className={`venue-area area-food ${isRahasya ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-orange-900/40 border-orange-500/30'}`}>
-                                            <span>FOOD</span>
-                                        </div>
-                                        <div className={`venue-area area-dj ${isRahasya ? 'bg-slate-900 border-slate-700' : 'bg-black border-drama'}`}>
-                                            <span>{isRahasya ? 'SURVEILLANCE' : 'DJ CONSOLE'}</span>
-                                        </div>
+                                            {/* DECORATIVE: Food & DJ */}
+                                            <div className={`venue-area area-food ${isRahasya ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-orange-900/40 border-orange-500/30'}`}>
+                                                <span>FOOD</span>
+                                            </div>
+                                            <div className={`venue-area area-dj ${isRahasya ? 'bg-slate-900 border-slate-700' : 'bg-black border-drama'}`}>
+                                                <span>{isRahasya ? 'SURVEILLANCE' : 'DJ CONSOLE'}</span>
+                                            </div>
 
+                                        </div>
                                     </div>
                                 </div>
                                 <button onClick={() => setStep(1)} className="mt-6 text-sm underline opacity-60 hover:opacity-100">Back to Details</button>
