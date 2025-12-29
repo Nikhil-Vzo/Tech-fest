@@ -10,6 +10,8 @@ const Booking = React.lazy(() => import('../pages/Booking').then(module => ({ de
 const About = React.lazy(() => import('../pages/InfoPages').then(module => ({ default: module.About })));
 const Schedule = React.lazy(() => import('../pages/Schedule').then(module => ({ default: module.Schedule })));
 const Gallery = React.lazy(() => import('../pages/Gallery').then(module => ({ default: module.Gallery })));
+// NEW: Import Receipt Page
+const Receipt = React.lazy(() => import('../pages/Receipt').then(module => ({ default: module.Receipt })));
 
 const RahasyaHome = React.lazy(() => import('../pages/RahasyaHome').then(module => ({ default: module.RahasyaHome })));
 const RahasyaEvents = React.lazy(() => import('../pages/RahasyaEvents').then(module => ({ default: module.RahasyaEvents })));
@@ -41,6 +43,8 @@ export const AnimatedRoutes: React.FC = () => {
                                     <Route path="/schedule" element={<Schedule />} />
                                     <Route path="/gallery" element={<Gallery />} />
                                     <Route path="/tickets" element={<Booking />} />
+                                    {/* NEW: Receipt Route */}
+                                    <Route path="/receipt" element={<Receipt />} />
 
                                     {/* Rahasya Routes */}
                                     <Route path="/rahasya" element={<RahasyaHome />} />
@@ -48,6 +52,8 @@ export const AnimatedRoutes: React.FC = () => {
                                     <Route path="/rahasya/events" element={<RahasyaEvents />} />
                                     <Route path="/rahasya/about" element={<RahasyaAbout />} />
                                     <Route path="/rahasya/timeline" element={<RahasyaTimeline />} />
+                                    {/* NEW: Rahasya Receipt Route */}
+                                    <Route path="/rahasya/receipt" element={<Receipt />} />
                                 </Routes>
                             </Suspense>
                         </PageWrapper>

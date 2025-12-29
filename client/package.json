@@ -21,6 +21,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.66.1",
+    "react-qr-code": "^2.0.18",
     "react-router-dom": "^7.9.6",
     "three": "^0.182.0",
     "zod": "^4.1.12"

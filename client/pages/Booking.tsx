@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,6 +7,13 @@ import { Button, Input, Card } from '../components/UIComponents';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CHHATTISGARH_COLLEGES } from '../constants';
 import { supabase } from '../src/supabaseClient';
+
+// Add Razorpay type definition
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
 
 // Database Row Type
 interface ZoneTier {
@@ -54,13 +60,14 @@ export const Booking: React.FC = () => {
         if (gridRef.current) {
             setGridHeight(gridRef.current.offsetHeight);
         }
-    }, [step, zoomLevel]); // Re-measure if step or zoom changes (though offsetHeight shouldn't change with zoom, capturing it initially is key)
+    }, [step, zoomLevel]);
 
     // User Data & Verification
     const [userData, setUserData] = useState<AttendeeFormData | null>(null);
     const [verificationInput, setVerificationInput] = useState('');
     const [isVerified, setIsVerified] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
+    const [isPaying, setIsPaying] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     const { register, handleSubmit, formState: { errors }, watch } = useForm<AttendeeFormData>({
@@ -89,16 +96,12 @@ export const Booking: React.FC = () => {
         fetchZones();
     }, []);
 
-    // Helper to find tier by ID
     const getTier = (id: string) => tiers.find(t => t.zone_id === id);
 
-    // 2. Logic: Who is allowed where?
     const isZoneRestricted = (tier: ZoneTier) => {
         if (isAmityStudent) {
-            // Amitians CANNOT book Non-Amitian zones (Tech Bazaar)
             return tier.category === 'NON-AMITIAN';
         } else {
-            // Non-Amitians CANNOT book Amitian zones (Star Circle, General)
             return tier.category === 'AMITIAN' || tier.zone_id === 'general-access';
         }
     };
@@ -106,13 +109,11 @@ export const Booking: React.FC = () => {
     const handleTierSelect = (tier?: ZoneTier) => {
         if (!tier) return;
 
-        // Check 1: Is it sold out or disabled by admin?
         if (!tier.is_active || tier.available_seats <= 0) {
             setToast({ message: "This zone is currently unavailable.", type: 'error' });
             return;
         }
 
-        // Check 2: Is the student allowed?
         if (isZoneRestricted(tier)) {
             const msg = isAmityStudent
                 ? "This zone is for external participants only."
@@ -128,14 +129,12 @@ export const Booking: React.FC = () => {
         setVerificationInput('');
     };
 
-    // Zoom Handlers
     const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.1, 2.0));
     const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.1, 0.5));
 
     const onUserSubmit = (data: AttendeeFormData) => {
         setUserData(data);
         setStep(2);
-        // Notification for zoom
         setTimeout(() => {
             setToast({ message: "Use the Zoom controls (+ / -) to view the full map!", type: 'success' });
         }, 500);
@@ -161,6 +160,92 @@ export const Booking: React.FC = () => {
                 setToast({ message: "Verified Successfully!", type: 'success' });
             }
         }, 1000);
+    };
+
+    // --- PAYMENT INTEGRATION ---
+
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    const handlePayment = async () => {
+        if (!selectedTier || !userData) return;
+        setIsPaying(true);
+
+        const totalAmount = calculateTotal();
+        const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+        // Check if Razorpay Key is configured
+        if (razorpayKey) {
+            const isLoaded = await loadRazorpayScript();
+
+            if (!isLoaded) {
+                setToast({ message: "Failed to load payment gateway. Please try again.", type: 'error' });
+                setIsPaying(false);
+                return;
+            }
+
+            const options = {
+                key: razorpayKey,
+                amount: totalAmount * 100, // Amount in paise
+                currency: "INR",
+                name: "Amispark x Rahasya 2026",
+                description: `Ticket: ${selectedTier.name}`,
+                image: "https://i.ibb.co/fz6gHG0L/Untitled-design-removebg-preview.png", // Optional: Add your logo here
+                handler: function (response: any) {
+                    // Payment Success Handler
+                    const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
+                    navigate(targetPath, {
+                        state: {
+                            paymentId: response.razorpay_payment_id,
+                            orderId: response.razorpay_order_id || "DEMO_ORDER_" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                            amount: totalAmount,
+                            items: [selectedTier.name, accommodation ? "Accommodation" : null].filter(Boolean),
+                            user: userData
+                        }
+                    });
+                },
+                prefill: {
+                    name: `${userData.firstName} ${userData.lastName}`,
+                    email: userData.email,
+                    contact: userData.phone,
+                },
+                theme: {
+                    color: isRahasya ? "#dc2626" : "#8a2be2", // Adaptive Theme Color
+                },
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+            setIsPaying(false); // Stop loading once modal opens
+
+        } else {
+            // FALLBACK: Simulation Mode (No Key Found)
+            console.log("No Razorpay Key found. Running simulation mode.");
+            
+            setTimeout(() => {
+                const dummyPaymentId = "pay_SIM_" + Math.random().toString(36).substr(2, 9).toUpperCase();
+                const dummyOrderId = "order_SIM_" + Math.random().toString(36).substr(2, 9).toUpperCase();
+                const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
+
+                navigate(targetPath, {
+                    state: {
+                        paymentId: dummyPaymentId,
+                        orderId: dummyOrderId,
+                        amount: totalAmount,
+                        items: [selectedTier.name, accommodation ? "Accommodation" : null].filter(Boolean),
+                        user: userData
+                    }
+                });
+                setIsPaying(false);
+            }, 2000);
+        }
     };
 
     if (loading) {
@@ -415,8 +500,19 @@ export const Booking: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <Button disabled={!isVerified} className="w-full bg-green-600 hover:bg-green-700 py-4 text-lg">
-                                    Proceed to Pay
+                                <Button
+                                    disabled={!isVerified || isPaying}
+                                    onClick={handlePayment}
+                                    className={`w-full py-4 text-lg flex items-center justify-center gap-2 ${isPaying ? 'opacity-70 cursor-wait' : 'bg-green-600 hover:bg-green-700'}`}
+                                >
+                                    {isPaying ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        "Proceed to Pay"
+                                    )}
                                 </Button>
                                 <button onClick={() => setStep(2)} className="mt-4 w-full text-sm underline opacity-60 hover:opacity-100">Change Zone</button>
                             </Card>
