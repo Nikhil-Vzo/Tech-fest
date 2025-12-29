@@ -10,8 +10,9 @@ const Booking = React.lazy(() => import('../pages/Booking').then(module => ({ de
 const About = React.lazy(() => import('../pages/InfoPages').then(module => ({ default: module.About })));
 const Schedule = React.lazy(() => import('../pages/Schedule').then(module => ({ default: module.Schedule })));
 const Gallery = React.lazy(() => import('../pages/Gallery').then(module => ({ default: module.Gallery })));
-// NEW: Import Receipt Page
 const Receipt = React.lazy(() => import('../pages/Receipt').then(module => ({ default: module.Receipt })));
+// NEW: Digital Ticket Page
+const DigitalTicket = React.lazy(() => import('../pages/DigitalTicket').then(module => ({ default: module.DigitalTicket })));
 
 const RahasyaHome = React.lazy(() => import('../pages/RahasyaHome').then(module => ({ default: module.RahasyaHome })));
 const RahasyaEvents = React.lazy(() => import('../pages/RahasyaEvents').then(module => ({ default: module.RahasyaEvents })));
@@ -29,7 +30,6 @@ export const AnimatedRoutes: React.FC = () => {
     const isRahasya = location.pathname.includes('/rahasya');
 
     return (
-        // Grid container allows stacking for concurrent Slide transition
         <div className="relative w-full min-h-screen grid grid-cols-1 grid-rows-1 overflow-x-hidden">
             <AnimatePresence initial={false}>
                 <Routes location={location} key={location.pathname}>
@@ -43,8 +43,10 @@ export const AnimatedRoutes: React.FC = () => {
                                     <Route path="/schedule" element={<Schedule />} />
                                     <Route path="/gallery" element={<Gallery />} />
                                     <Route path="/tickets" element={<Booking />} />
-                                    {/* NEW: Receipt Route */}
                                     <Route path="/receipt" element={<Receipt />} />
+                                    
+                                    {/* NEW: Public Ticket View Route */}
+                                    <Route path="/ticket-view" element={<DigitalTicket />} />
 
                                     {/* Rahasya Routes */}
                                     <Route path="/rahasya" element={<RahasyaHome />} />
@@ -52,7 +54,6 @@ export const AnimatedRoutes: React.FC = () => {
                                     <Route path="/rahasya/events" element={<RahasyaEvents />} />
                                     <Route path="/rahasya/about" element={<RahasyaAbout />} />
                                     <Route path="/rahasya/timeline" element={<RahasyaTimeline />} />
-                                    {/* NEW: Rahasya Receipt Route */}
                                     <Route path="/rahasya/receipt" element={<Receipt />} />
                                 </Routes>
                             </Suspense>
@@ -66,18 +67,12 @@ export const AnimatedRoutes: React.FC = () => {
 
 // Wrapper that handles the animation lifecycle
 const PageWrapper: React.FC<{ children: React.ReactNode, isRahasya: boolean }> = ({ children, isRahasya }) => {
-
-    // --- ANIMATION STRATEGY ---
-    // AMISPARK: "Side Slide" (Concurrent Overlap) - Handled by Framer Motion
-    // RAHASYA: INSTANT (Static)
-
     const slideVariants = {
         initial: { x: '100%', zIndex: 20 },
         animate: { x: 0, zIndex: 20 },
         exit: { x: '-25%', zIndex: 0, opacity: 0.5 },
     };
 
-    // Static Framer variant for Rahasya (Instant switch, no GSAP)
     const staticVariants = {
         initial: { opacity: 1, x: 0 },
         animate: { opacity: 1, x: 0, transition: { duration: 0 } },
@@ -86,7 +81,6 @@ const PageWrapper: React.FC<{ children: React.ReactNode, isRahasya: boolean }> =
 
     return (
         <div className="col-start-1 row-start-1 w-full min-h-screen">
-            {/* The Page Content */}
             <motion.div
                 className={`w-full min-h-screen ${isRahasya ? 'bg-noir-900 overflow-hidden' : 'bg-bollywood-900'}`}
                 variants={isRahasya ? staticVariants : slideVariants}

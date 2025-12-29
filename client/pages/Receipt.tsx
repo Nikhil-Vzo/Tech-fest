@@ -25,8 +25,8 @@ export const Receipt: React.FC = () => {
 
     const isRahasya = location.pathname.includes('/rahasya');
 
-    // Prepare data for the QR Code
-    const ticketData = JSON.stringify({
+    // 1. Create the data object
+    const ticketRawData = {
         event: "AMISPARK x RAHASYA 2026",
         ticket_id: orderId,
         payment_ref: paymentId,
@@ -36,8 +36,16 @@ export const Receipt: React.FC = () => {
         zone: items?.join(', '),
         amount_paid: amount,
         status: "CONFIRMED",
+        is_rahasya: isRahasya,
         issued_at: new Date().toISOString()
-    });
+    };
+
+    // 2. Encode it for the URL (Base64) to keep the QR clean
+    const encodedData = btoa(JSON.stringify(ticketRawData));
+    
+    // 3. Construct the Full URL
+    // Uses window.location.origin (e.g., https://your-site.com) + /#/ticket-view
+    const qrUrl = `${window.location.origin}/#/ticket-view?data=${encodedData}`;
 
     return (
         <div className={`min-h-screen py-24 px-4 ${isRahasya ? 'bg-noir-900 text-slate-300 font-mono' : 'bg-bollywood-900 text-glitz-paper font-body'}`}>
@@ -59,15 +67,15 @@ export const Receipt: React.FC = () => {
                     <div className="flex flex-col items-center justify-center mb-8">
                         <div className="bg-white p-4 rounded-lg shadow-lg">
                             <QRCode 
-                                value={ticketData}
+                                value={qrUrl}
                                 size={180}
-                                level="M" // Medium error correction
+                                level="M"
                                 fgColor="#000000"
                                 bgColor="#ffffff"
                             />
                         </div>
                         <p className="mt-4 text-xs font-mono opacity-50 uppercase tracking-widest">
-                            Scan for Ticket Details
+                            Scan to View Digital Ticket
                         </p>
                     </div>
 
