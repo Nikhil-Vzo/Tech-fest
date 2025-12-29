@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Ticket, Users, CreditCard, Check, AlertCircle, Lock, Upload } from 'lucide-react';
+import { Ticket, Users, CreditCard, Check, AlertCircle, Lock, Upload, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import { Button, Input, Card } from '../components/UIComponents';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CHHATTISGARH_COLLEGES } from '../constants';
@@ -65,6 +65,15 @@ export const Booking: React.FC = () => {
     const [isVerified, setIsVerified] = useState(false); // Renamed from isEmailVerified to generic isVerified
     const [isVerifying, setIsVerifying] = useState(false);
 
+    // Zoom / Pinch State
+    const [scale, setScale] = useState(1);
+    const initialPinchDistance = React.useRef<number | null>(null);
+    const initialScale = React.useRef<number>(1);
+    const gridRef = React.useRef<HTMLDivElement>(null);
+    const summaryRef = React.useRef<HTMLDivElement>(null);
+    const [gridDimensions, setGridDimensions] = useState({ width: 0, height: 0 });
+    const [hasInteracted, setHasInteracted] = useState(false);
+
     const { register, handleSubmit, formState: { errors }, watch } = useForm<AttendeeFormData>({
         resolver: zodResolver(attendeeSchema)
     });
@@ -112,7 +121,69 @@ export const Booking: React.FC = () => {
         setIsVerified(false); // Reset verification
         setVerificationEmail('');
         setVerificationId('');
+        resetZoom();
     };
+
+    // Zoom Handlers
+    const resetZoom = () => setScale(1);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        setHasInteracted(true);
+        if (e.touches.length === 2) {
+            const dist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            initialPinchDistance.current = dist;
+            initialScale.current = scale;
+        }
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (e.touches.length === 2 && initialPinchDistance.current !== null) {
+            const dist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            const delta = dist / initialPinchDistance.current;
+            const newScale = Math.min(Math.max(initialScale.current * delta, 0.5), 1.5); // Clamp between 0.5x and 1.5x
+            setScale(newScale);
+        }
+    };
+
+    const handleZoomIn = () => {
+        setHasInteracted(true);
+        setScale(prev => Math.min(prev + 0.1, 1.5));
+    };
+    const handleZoomOut = () => {
+        setHasInteracted(true);
+        setScale(prev => Math.max(prev - 0.1, 0.5));
+    };
+
+    useEffect(() => {
+        if (gridRef.current) {
+            setGridDimensions({
+                width: gridRef.current.offsetWidth,
+                height: gridRef.current.offsetHeight
+            });
+        }
+    }, [step, isRahasya]); // Recalculate when view changes
+
+    // Notify user about pinch gesture when entering step 2
+    useEffect(() => {
+        if (step === 2 && !isRahasya) {
+            // Only show if on mobile/touch device roughly (or just always show as a hint)
+            setToast({ message: "Tip: Pinch to zoom in/out of the layout!", type: 'success' });
+            setTimeout(() => setToast(null), 4000);
+        }
+    }, [step, isRahasya]);
+
+    // Auto-scroll to summary when reaching step 3
+    useEffect(() => {
+        if (step === 3 && summaryRef.current) {
+            summaryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [step]);
 
     const handleVerify = () => {
         if (isAmity) {
@@ -328,17 +399,38 @@ export const Booking: React.FC = () => {
                                             <div className="lg:hidden absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-black/80 to-transparent z-10 pointer-events-none" />
 
                                             {/* Animated Hand Icon Hint */}
-                                            <div className="lg:hidden absolute inset-0 z-20 pointer-events-none flex items-center justify-center opacity-0 animate-[fadeInOut_3s_ease-in-out_infinite]">
-                                                <div className="bg-black/80 rounded-xl px-6 py-3 backdrop-blur-md border border-white/10 flex flex-col items-center gap-2 shadow-2xl">
-                                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white animate-[swipe_1.5s_ease-in-out_infinite]">
-                                                        <path d="M18 11.5C18 10.1193 16.8807 9 15.5 9C14.1193 9 13 10.1193 13 11.5V11.72C12.78 11.57 12.52 11.5 12.25 11.5C11.0074 11.5 10 12.5074 10 13.75V14H9.5C8.11929 14 7 15.1193 7 16.5C7 17.8807 8.11929 19 9.5 19H15.5C16.8807 19 18 17.8807 18 16.5V11.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                    <span className="text-white/90 text-sm font-medium whitespace-nowrap">Swipe to explore</span>
+                                            {!hasInteracted && (
+                                                <div className="lg:hidden absolute inset-0 z-20 pointer-events-none flex items-center justify-center opacity-0 animate-[fadeInOut_3s_ease-in-out_infinite]">
+                                                    <div className="bg-black/80 rounded-xl px-6 py-3 backdrop-blur-md border border-white/10 flex flex-col items-center gap-2 shadow-2xl">
+                                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white animate-[swipe_1.5s_ease-in-out_infinite]">
+                                                            <path d="M18 11.5C18 10.1193 16.8807 9 15.5 9C14.1193 9 13 10.1193 13 11.5V11.72C12.78 11.57 12.52 11.5 12.25 11.5C11.0074 11.5 10 12.5074 10 13.75V14H9.5C8.11929 14 7 15.1193 7 16.5C7 17.8807 8.11929 19 9.5 19H15.5C16.8807 19 18 17.8807 18 16.5V11.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                        </svg>
+                                                        <span className="text-white/90 text-sm font-medium whitespace-nowrap">Swipe to explore</span>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
 
-                                            <div className="overflow-x-auto py-4">
-                                                <div className={`venue-grid ${isRahasya ? 'venue-noir' : 'venue-bollywood'} min-w-[600px]`}>
+                                            <div
+                                                className="overflow-auto py-4 border border-white/10 rounded-lg relative touch-pan-x touch-pan-y"
+                                                onTouchStart={handleTouchStart}
+                                                onTouchMove={handleTouchMove}
+                                            >
+                                                {/* Zoom Controls */}
+                                                <div className="absolute top-4 right-4 z-30 flex flex-col gap-2">
+                                                    <button onClick={handleZoomIn} className="p-2 bg-black/60 text-white rounded-full backdrop-blur hover:bg-black/80"><ZoomIn className="w-5 h-5" /></button>
+                                                    <button onClick={handleZoomOut} className="p-2 bg-black/60 text-white rounded-full backdrop-blur hover:bg-black/80"><ZoomOut className="w-5 h-5" /></button>
+                                                    <button onClick={resetZoom} className="p-2 bg-black/60 text-white rounded-full backdrop-blur hover:bg-black/80" title="Reset View"><Maximize className="w-5 h-5" /></button>
+                                                </div>
+
+                                                <div
+                                                    ref={gridRef}
+                                                    className={`venue-grid ${isRahasya ? 'venue-noir' : 'venue-bollywood'} min-w-[600px] origin-top-left transition-transform duration-75 ease-out`}
+                                                    style={{
+                                                        transform: `scale(${scale})`,
+                                                        marginBottom: gridDimensions.height * (scale - 1),
+                                                        marginRight: gridDimensions.width * (scale - 1)
+                                                    }}
+                                                >
                                                     {/* Stage */}
                                                     <div className={`venue-area area-stage-top ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
                                                         <span>{isRahasya ? 'MAIN TERMINAL' : 'STAGE'}</span>
@@ -425,96 +517,98 @@ export const Booking: React.FC = () => {
                         )}
 
                         {step === 3 && selectedTier && (
-                            <Card className={`p-6 ${isRahasya ? 'bg-black/40 border-slate-800' : 'bg-bollywood-800 border-drama'}`}>
-                                <h3 className={`text-xl font-bold mb-6 ${isRahasya ? 'text-white' : 'text-glitz-gold'}`}>Order Summary</h3>
+                            <div ref={summaryRef}>
+                                <Card className={`p-6 ${isRahasya ? 'bg-black/40 border-slate-800' : 'bg-bollywood-800 border-drama'}`}>
+                                    <h3 className={`text-xl font-bold mb-6 ${isRahasya ? 'text-white' : 'text-glitz-gold'}`}>Order Summary</h3>
 
-                                <div className="space-y-4 mb-6 text-sm">
-                                    <div className="flex justify-between">
-                                        <span>Zone</span>
-                                        <span className="font-bold">{selectedTier.name}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Base Price</span>
-                                        <span className="font-bold">₹{selectedTier.basePrice}</span>
-                                    </div>
-                                    <div className="flex justify-between text-glitz-paper/70">
-                                        <span>TechFest & Games</span>
-                                        <span className="font-bold">+ ₹300</span>
-                                    </div>
-
-                                    {/* Accommodation Checkbox for All Students */}
-                                    {/* Show for Tech Bazaar (External) OR Any Amity Booking */}
-                                    {(selectedTier.id === 'tech-fest' || isAmity) && (
-                                        <div className="border-t border-white/10 pt-4 mt-4">
-                                            <div className="mb-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded text-sm">
-                                                <p className="mb-2">Looking for accommodation?</p>
-                                                <a
-                                                    href="https://forms.google.com/your-form-url"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-400 hover:text-blue-300 underline font-bold"
-                                                >
-                                                    Fill this Google Form first
-                                                </a>
-                                            </div>
-                                            <label className="flex items-center gap-2 cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={accommodation}
-                                                    onChange={(e) => setAccommodation(e.target.checked)}
-                                                    className="w-4 h-4 rounded border-gray-300 text-drama focus:ring-drama"
-                                                />
-                                                <span>Include Accommodation (+₹300)</span>
-                                            </label>
+                                    <div className="space-y-4 mb-6 text-sm">
+                                        <div className="flex justify-between">
+                                            <span>Zone</span>
+                                            <span className="font-bold">{selectedTier.name}</span>
                                         </div>
-                                    )}
+                                        <div className="flex justify-between">
+                                            <span>Base Price</span>
+                                            <span className="font-bold">₹{selectedTier.basePrice}</span>
+                                        </div>
+                                        <div className="flex justify-between text-glitz-paper/70">
+                                            <span>TechFest & Games</span>
+                                            <span className="font-bold">+ ₹300</span>
+                                        </div>
 
-                                    <div className="flex justify-between text-lg font-bold border-t border-white/10 pt-4">
-                                        <span>Total</span>
-                                        <span>₹{calculateTotal()}</span>
-                                    </div>
-                                </div>
-
-                                {/* Verification Section (Email for Amity, ID for others) */}
-                                <div className="mb-6 border-t border-white/10 pt-4">
-                                    <h4 className="font-bold mb-3">{isAmity ? 'College Email Verification' : 'Student Identity Verification'}</h4>
-                                    <div className="flex gap-2">
-                                        {isAmity ? (
-                                            <Input
-                                                placeholder="Amity Email ID"
-                                                value={verificationEmail}
-                                                onChange={(e) => setVerificationEmail(e.target.value)}
-                                                className={`flex-1 min-w-0 ${isRahasya ? 'bg-slate-900 border-slate-700' : ''}`}
-                                                disabled={isVerified}
-                                            />
-                                        ) : (
-                                            <Input
-                                                placeholder="College ID No."
-                                                value={verificationId}
-                                                onChange={(e) => setVerificationId(e.target.value)}
-                                                className={`flex-1 min-w-0 ${isRahasya ? 'bg-slate-900 border-slate-700' : ''}`}
-                                                disabled={isVerified}
-                                            />
+                                        {/* Accommodation Checkbox for All Students */}
+                                        {/* Show for Tech Bazaar (External) OR Any Amity Booking */}
+                                        {(selectedTier.id === 'tech-fest' || isAmity) && (
+                                            <div className="border-t border-white/10 pt-4 mt-4">
+                                                <div className="mb-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded text-sm">
+                                                    <p className="mb-2">Looking for accommodation?</p>
+                                                    <a
+                                                        href="https://forms.google.com/your-form-url"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-400 hover:text-blue-300 underline font-bold"
+                                                    >
+                                                        Fill this Google Form first
+                                                    </a>
+                                                </div>
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={accommodation}
+                                                        onChange={(e) => setAccommodation(e.target.checked)}
+                                                        className="w-4 h-4 rounded border-gray-300 text-drama focus:ring-drama"
+                                                    />
+                                                    <span>Include Accommodation (+₹300)</span>
+                                                </label>
+                                            </div>
                                         )}
-                                        <Button
-                                            onClick={handleVerify}
-                                            disabled={isVerified || isVerifying}
-                                            className={`${isVerified ? 'bg-green-600' : 'bg-blue-600'} text-white px-4`}
-                                        >
-                                            {isVerifying ? '...' : isVerified ? <Check className="w-4 h-4" /> : 'Verify'}
-                                        </Button>
-                                    </div>
-                                    {isVerified && <p className="text-green-500 text-xs mt-1">
-                                        {isAmity ? "Email verified successfully" : "ID verified successfully"}
-                                    </p>}
-                                </div>
 
-                                <Button onClick={handlePayment} variant="primary" className={`w-full ${isRahasya ? 'bg-blood hover:bg-red-700' : 'bg-drama hover:bg-drama-light'}`} disabled={!isVerified}>
-                                    <CreditCard className="w-4 h-4 mr-2 inline" />
-                                    Pay Now
-                                </Button>
-                                <button onClick={() => setStep(2)} className="w-full mt-4 text-sm underline opacity-60 hover:opacity-100">Back</button>
-                            </Card>
+                                        <div className="flex justify-between text-lg font-bold border-t border-white/10 pt-4">
+                                            <span>Total</span>
+                                            <span>₹{calculateTotal()}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Verification Section (Email for Amity, ID for others) */}
+                                    <div className="mb-6 border-t border-white/10 pt-4">
+                                        <h4 className="font-bold mb-3">{isAmity ? 'College Email Verification' : 'Student Identity Verification'}</h4>
+                                        <div className="flex gap-2">
+                                            {isAmity ? (
+                                                <Input
+                                                    placeholder="Amity Email ID"
+                                                    value={verificationEmail}
+                                                    onChange={(e) => setVerificationEmail(e.target.value)}
+                                                    className={`flex-1 min-w-0 ${isRahasya ? 'bg-slate-900 border-slate-700' : ''}`}
+                                                    disabled={isVerified}
+                                                />
+                                            ) : (
+                                                <Input
+                                                    placeholder="College ID No."
+                                                    value={verificationId}
+                                                    onChange={(e) => setVerificationId(e.target.value)}
+                                                    className={`flex-1 min-w-0 ${isRahasya ? 'bg-slate-900 border-slate-700' : ''}`}
+                                                    disabled={isVerified}
+                                                />
+                                            )}
+                                            <Button
+                                                onClick={handleVerify}
+                                                disabled={isVerified || isVerifying}
+                                                className={`${isVerified ? 'bg-green-600' : 'bg-blue-600'} text-white px-4`}
+                                            >
+                                                {isVerifying ? '...' : isVerified ? <Check className="w-4 h-4" /> : 'Verify'}
+                                            </Button>
+                                        </div>
+                                        {isVerified && <p className="text-green-500 text-xs mt-1">
+                                            {isAmity ? "Email verified successfully" : "ID verified successfully"}
+                                        </p>}
+                                    </div>
+
+                                    <Button onClick={handlePayment} variant="primary" className={`w-full ${isRahasya ? 'bg-blood hover:bg-red-700' : 'bg-drama hover:bg-drama-light'}`} disabled={!isVerified}>
+                                        <CreditCard className="w-4 h-4 mr-2 inline" />
+                                        Pay Now
+                                    </Button>
+                                    <button onClick={() => setStep(2)} className="w-full mt-4 text-sm underline opacity-60 hover:opacity-100">Back</button>
+                                </Card>
+                            </div>
                         )}
 
                         {step === 4 && (
