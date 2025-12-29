@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Music } from 'lucide-react';
 
 
 
-// Spotlight Beam Component
 const Spotlight = ({ position, delay, color }: { position: 'left' | 'right', delay: number, color: string }) => {
     return (
         <motion.div
@@ -33,7 +33,7 @@ const Flashbulb = () => {
         setStyle({
             top: Math.random() * 100,
             left: Math.random() * 100,
-            scale: Math.random() * 0.5 + 0.5
+            scale: Math.random() * 0.8 + 0.8 // Increased minimum scale for better visibility
         });
     }, []);
 
@@ -43,65 +43,78 @@ const Flashbulb = () => {
             style={{
                 top: `${style.top}%`,
                 left: `${style.left}%`,
-                width: '100px',
-                height: '100px',
+                width: '120px', // Slightly larger
+                height: '120px',
             }}
             initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: [0, 0.8, 0], scale: [0, 1.5, 0] }}
+            animate={{ opacity: [0, 0.9, 0], scale: [0, 1.5, 0] }} // Higher peak opacity
             transition={{
-                duration: 0.2,
+                duration: 0.15, // Snappier flash
                 repeat: Infinity,
-                repeatDelay: Math.random() * 2 + 0.5, // Faster flashes (0.5-2.5s)
+                repeatDelay: Math.random() * 2 + 0.2, // Slightly more frequent
                 ease: "easeOut"
             }}
         />
     );
 };
 
-// Gold Dust Component (Restored)
-const GoldParticle = () => {
-    const left = Math.random() * 100;
-    const duration = Math.random() * 5 + 5;
-    const size = Math.random() * 4 + 2;
+// Floating Music Note Component
+const MusicNote = () => {
+    // Theme Palette: Gold, Purple, Blue, White
+    const colors = ['#FBBF24', '#C084FC', '#60A5FA', '#FFFFFF'];
+
+    // Select random color once on mount
+    const [config] = useState(() => ({
+        color: colors[Math.floor(Math.random() * colors.length)],
+        left: Math.random() * 100,
+        duration: Math.random() * 15 + 10,
+        size: Math.random() * 20 + 20, // 20px - 40px
+        rotation: Math.random() * 360,
+        delay: -(Math.random() * 10)
+    }));
 
     return (
         <motion.div
-            className="absolute bg-glitz-gold rounded-full opacity-60 pointer-events-none z-0"
+            className="absolute pointer-events-none z-0"
             style={{
-                left: `${left}%`,
-                width: size,
-                height: size,
-                top: '110vh'
+                color: config.color,
+                left: `${config.left}%`,
+                top: '100%',
+                filter: `drop-shadow(0 0 8px ${config.color})` // Glow matches the note color
             }}
             animate={{
-                y: -1200,
-                opacity: [0, 0.8, 0],
+                top: '-10%',
+                opacity: [0, 1, 1, 0],
+                rotate: [config.rotation, config.rotation + 360],
             }}
             transition={{
-                duration: duration,
+                duration: config.duration,
                 repeat: Infinity,
                 ease: "linear",
-                delay: Math.random() * -20 // Pre-warm the animation so dust is already 
+                delay: config.delay,
+                repeatDelay: 0
             }}
-        />
+        >
+            <Music size={config.size} />
+        </motion.div>
     );
 };
 
 export const AmisparkFloatingIcons: React.FC = () => {
     return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
             {/* Spotlights - Instant Start */}
             <Spotlight position="left" delay={0} color="var(--color-drama)" />
             <Spotlight position="right" delay={0.2} color="var(--color-glitz-gold)" />
 
-            {/* Flashbulbs - Paparazzi Effect (Increased Count) */}
-            {[...Array(12)].map((_, i) => (
+            {/* Flashbulbs - Paparazzi Effect */}
+            {[...Array(8)].map((_, i) => (
                 <Flashbulb key={`flash-${i}`} />
             ))}
 
-            {/* Rising Gold Dust (Restored) */}
-            {[...Array(30)].map((_, i) => (
-                <GoldParticle key={`dust-${i}`} />
+            {/* Floating Music Notes */}
+            {[...Array(15)].map((_, i) => (
+                <MusicNote key={`note-${i}`} />
             ))}
         </div>
     );
