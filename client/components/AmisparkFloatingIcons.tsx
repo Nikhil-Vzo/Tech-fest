@@ -60,12 +60,7 @@ const Flashbulb = () => {
 
 // Floating Music Note Component
 const MusicNote = () => {
-    // Theme Palette: Gold, Purple, Blue, White
-    const colors = ['#FBBF24', '#C084FC', '#60A5FA', '#FFFFFF'];
-
-    // Select random color once on mount
     const [config] = useState(() => ({
-        color: colors[Math.floor(Math.random() * colors.length)],
         left: Math.random() * 100,
         duration: Math.random() * 15 + 10,
         size: Math.random() * 20 + 20, // 20px - 40px
@@ -75,12 +70,11 @@ const MusicNote = () => {
 
     return (
         <motion.div
-            className="absolute pointer-events-none z-0"
+            className="absolute pointer-events-none z-0 text-white"
             style={{
-                color: config.color,
                 left: `${config.left}%`,
                 top: '100%',
-                filter: `drop-shadow(0 0 8px ${config.color})` // Glow matches the note color
+                // Removed filter to prevent rendering artifacts
             }}
             animate={{
                 top: '-10%',
@@ -102,7 +96,7 @@ const MusicNote = () => {
 
 export const AmisparkFloatingIcons: React.FC = () => {
     return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-[10]">
             {/* Spotlights - Instant Start */}
             <Spotlight position="left" delay={0} color="var(--color-drama)" />
             <Spotlight position="right" delay={0.2} color="var(--color-glitz-gold)" />
