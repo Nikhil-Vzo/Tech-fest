@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Check, Download, Home, AlertTriangle } from 'lucide-react';
+import { Check, Home, AlertTriangle } from 'lucide-react';
 import { Card, Button } from '../components/UIComponents';
 import QRCode from "react-qr-code";
 
@@ -9,7 +9,7 @@ export const Receipt: React.FC = () => {
     const navigate = useNavigate();
     
     // Retrieve data passed from Booking page
-    const { paymentId, orderId, amount, items, user } = location.state || {};
+    const { paymentId, orderId, amount, items, user, verificationId } = location.state || {};
 
     // Fallback if accessed directly without data
     if (!paymentId) {
@@ -25,7 +25,7 @@ export const Receipt: React.FC = () => {
 
     const isRahasya = location.pathname.includes('/rahasya');
 
-    // 1. Create the data object
+    // 1. Create the data object - WITH VERIFICATION ID
     const ticketRawData = {
         event: "AMISPARK x RAHASYA 2026",
         ticket_id: orderId,
@@ -33,6 +33,7 @@ export const Receipt: React.FC = () => {
         attendee_name: `${user?.firstName} ${user?.lastName}`,
         attendee_email: user?.email,
         college: user?.college,
+        verification_id: verificationId, // Ensuring this is passed
         zone: items?.join(', '),
         amount_paid: amount,
         status: "CONFIRMED",
@@ -40,11 +41,10 @@ export const Receipt: React.FC = () => {
         issued_at: new Date().toISOString()
     };
 
-    // 2. Encode it for the URL (Base64) to keep the QR clean
+    // 2. Encode it for the URL (Base64)
     const encodedData = btoa(JSON.stringify(ticketRawData));
     
     // 3. Construct the Full URL
-    // Uses window.location.origin (e.g., https://your-site.com) + /#/ticket-view
     const qrUrl = `${window.location.origin}/#/ticket-view?data=${encodedData}`;
 
     return (
@@ -100,8 +100,8 @@ export const Receipt: React.FC = () => {
                                 <span>{user?.email}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="opacity-70">College</span>
-                                <span>{user?.college}</span>
+                                <span className="opacity-70">Verification ID</span>
+                                <span className="font-mono text-xs">{verificationId || 'N/A'}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="opacity-70">Items</span>
@@ -123,11 +123,9 @@ export const Receipt: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Footer Actions - REMOVED DOWNLOAD BUTTON */}
                     <div className="flex flex-col md:flex-row gap-4 justify-center">
-                        <Button onClick={() => window.print()} variant="secondary" className="flex items-center gap-2 justify-center">
-                            <Download className="w-4 h-4" /> Download Receipt
-                        </Button>
-                        <Button onClick={() => navigate('/')} className="flex items-center gap-2 justify-center">
+                        <Button onClick={() => navigate('/')} className="flex items-center gap-2 justify-center w-full md:w-auto">
                             <Home className="w-4 h-4" /> Return to Home
                         </Button>
                     </div>

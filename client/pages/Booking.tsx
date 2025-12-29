@@ -162,8 +162,41 @@ export const Booking: React.FC = () => {
         }, 1000);
     };
 
-    // --- PAYMENT INTEGRATION ---
+    // --- DB SAVE FUNCTION ---
+    const saveBookingToSupabase = async (paymentId: string, orderId: string, amount: number) => {
+        if (!userData || !selectedTier) return false;
 
+        const { error } = await supabase
+            .from('bookings')
+            .insert([
+                {
+                    payment_id: paymentId,
+                    order_id: orderId,
+                    first_name: userData.firstName,
+                    last_name: userData.lastName,
+                    email: userData.email,
+                    phone: userData.phone,
+                    gender: userData.gender,
+                    college: userData.college,
+                    zone_id: selectedTier.zone_id,
+                    tier_name: selectedTier.name,
+                    accommodation: accommodation,
+                    amount_paid: amount,
+                    status: 'CONFIRMED',
+                    is_rahasya: isRahasya,
+                    verification_id: verificationInput, // Saving the ID used for verification
+                    created_at: new Date().toISOString()
+                }
+            ]);
+
+        if (error) {
+            console.error('Database Error:', error);
+            // We proceed with UI flow even if DB log fails for demo purposes
+        }
+        return true;
+    };
+
+    // --- PAYMENT INTEGRATION ---
     const loadRazorpayScript = () => {
         return new Promise((resolve) => {
             const script = document.createElement("script");
@@ -181,7 +214,24 @@ export const Booking: React.FC = () => {
         const totalAmount = calculateTotal();
         const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
-        // Check if Razorpay Key is configured
+        // Shared Success Handler
+        const onPaymentSuccess = async (pId: string, oId: string) => {
+            await saveBookingToSupabase(pId, oId, totalAmount);
+            
+            const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
+            navigate(targetPath, {
+                state: {
+                    paymentId: pId,
+                    orderId: oId,
+                    amount: totalAmount,
+                    items: [selectedTier.name, accommodation ? "Accommodation" : null].filter(Boolean),
+                    user: userData,
+                    verificationId: verificationInput // PASSING EXISTING INPUT
+                }
+            });
+            setIsPaying(false);
+        };
+
         if (razorpayKey) {
             const isLoaded = await loadRazorpayScript();
 
@@ -193,23 +243,16 @@ export const Booking: React.FC = () => {
 
             const options = {
                 key: razorpayKey,
-                amount: totalAmount * 100, // Amount in paise
+                amount: totalAmount * 100,
                 currency: "INR",
                 name: "Amispark x Rahasya 2026",
                 description: `Ticket: ${selectedTier.name}`,
-                image: "https://i.ibb.co/fz6gHG0L/Untitled-design-removebg-preview.png", // Optional: Add your logo here
+                image: "https://i.ibb.co/fz6gHG0L/Untitled-design-removebg-preview.png",
                 handler: function (response: any) {
-                    // Payment Success Handler
-                    const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
-                    navigate(targetPath, {
-                        state: {
-                            paymentId: response.razorpay_payment_id,
-                            orderId: response.razorpay_order_id || "DEMO_ORDER_" + Math.random().toString(36).substr(2, 9).toUpperCase(),
-                            amount: totalAmount,
-                            items: [selectedTier.name, accommodation ? "Accommodation" : null].filter(Boolean),
-                            user: userData
-                        }
-                    });
+                    onPaymentSuccess(
+                        response.razorpay_payment_id, 
+                        response.razorpay_order_id || "ORD_" + Date.now()
+                    );
                 },
                 prefill: {
                     name: `${userData.firstName} ${userData.lastName}`,
@@ -217,33 +260,21 @@ export const Booking: React.FC = () => {
                     contact: userData.phone,
                 },
                 theme: {
-                    color: isRahasya ? "#dc2626" : "#8a2be2", // Adaptive Theme Color
+                    color: isRahasya ? "#dc2626" : "#8a2be2",
                 },
             };
 
             const paymentObject = new window.Razorpay(options);
             paymentObject.open();
-            setIsPaying(false); // Stop loading once modal opens
+            setIsPaying(false);
 
         } else {
-            // FALLBACK: Simulation Mode (No Key Found)
-            console.log("No Razorpay Key found. Running simulation mode.");
-            
-            setTimeout(() => {
+            // SIMULATION MODE
+            setTimeout(async () => {
                 const dummyPaymentId = "pay_SIM_" + Math.random().toString(36).substr(2, 9).toUpperCase();
                 const dummyOrderId = "order_SIM_" + Math.random().toString(36).substr(2, 9).toUpperCase();
-                const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
-
-                navigate(targetPath, {
-                    state: {
-                        paymentId: dummyPaymentId,
-                        orderId: dummyOrderId,
-                        amount: totalAmount,
-                        items: [selectedTier.name, accommodation ? "Accommodation" : null].filter(Boolean),
-                        user: userData
-                    }
-                });
-                setIsPaying(false);
+                
+                await onPaymentSuccess(dummyPaymentId, dummyOrderId);
             }, 2000);
         }
     };
@@ -318,7 +349,7 @@ export const Booking: React.FC = () => {
                             </Card>
                         )}
 
-                        {/* STEP 2: The Original Visual Venue Layout */}
+                        {/* STEP 2: Venue Layout */}
                         {step === 2 && (
                             <Card className={`p-6 ${isRahasya ? 'bg-black/40 border-slate-800' : 'bg-bollywood-800 border-drama'}`}>
                                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><Ticket className="w-5 h-5" /> Select Zone</h2>
@@ -339,10 +370,7 @@ export const Booking: React.FC = () => {
                                         }}
                                         ref={gridRef}
                                     >
-                                        {/* The CSS Grid Visual Map */}
                                         <div className={`venue-grid ${isRahasya ? 'venue-noir' : 'venue-bollywood'} min-w-[600px] mx-auto`}>
-
-                                            {/* DECORATIVE: Stage & Ramp */}
                                             <div className={`venue-area area-stage-top ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
                                                 <span>{isRahasya ? 'TERMINAL' : 'STAGE'}</span>
                                             </div>
@@ -350,11 +378,10 @@ export const Booking: React.FC = () => {
                                                 <span>{isRahasya ? 'LINK' : 'RAMP'}</span>
                                             </div>
 
-                                            {/* INTERACTIVE 1: TECH BAZAAR (Left) */}
+                                            {/* TECH BAZAAR */}
                                             {(() => {
                                                 const tier = getTier('tech-bazaar');
                                                 const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
-
                                                 return (
                                                     <div
                                                         className={`venue-area area-techfest ${isRahasya ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-purple-900/40 border-purple-500/30 hover:bg-purple-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
@@ -370,17 +397,16 @@ export const Booking: React.FC = () => {
                                                 );
                                             })()}
 
-                                            {/* DECORATIVE: Faculty (Right - Restricted) */}
+                                            {/* FACULTY */}
                                             <div className={`venue-area area-faculty ${isRahasya ? 'bg-red-950 border-red-900/50 cursor-not-allowed text-red-800' : 'bg-red-900/40 border-red-500/30 cursor-not-allowed'}`}>
                                                 <span>FACULTY</span>
                                                 <div className="absolute top-2 right-2"><Lock className="w-4 h-4" /></div>
                                             </div>
 
-                                            {/* INTERACTIVE 2: STAR CIRCLE (Center) */}
+                                            {/* STAR CIRCLE */}
                                             {(() => {
                                                 const tier = getTier('star-circle');
                                                 const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
-
                                                 return (
                                                     <div
                                                         className={`venue-area area-fanpit ${isRahasya ? 'bg-black border-slate-600 text-white' : 'bg-pink-900/40 border-pink-500/30 hover:bg-pink-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
@@ -396,11 +422,10 @@ export const Booking: React.FC = () => {
                                                 );
                                             })()}
 
-                                            {/* INTERACTIVE 3: GENERAL ACCESS (Bottom) */}
+                                            {/* GENERAL ACCESS */}
                                             {(() => {
                                                 const tier = getTier('general-access');
                                                 const locked = tier ? (!tier.is_active || tier.available_seats === 0 || isZoneRestricted(tier)) : true;
-
                                                 return (
                                                     <div
                                                         className={`venue-area area-general ${isRahasya ? 'bg-slate-800 border-slate-600 text-slate-400' : 'bg-indigo-900/40 border-indigo-500/30 hover:bg-indigo-900/60'} ${locked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
@@ -416,14 +441,12 @@ export const Booking: React.FC = () => {
                                                 );
                                             })()}
 
-                                            {/* DECORATIVE: Food & DJ */}
                                             <div className={`venue-area area-food ${isRahasya ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-orange-900/40 border-orange-500/30'}`}>
                                                 <span>FOOD</span>
                                             </div>
                                             <div className={`venue-area area-dj ${isRahasya ? 'bg-slate-900 border-slate-700' : 'bg-black border-drama'}`}>
                                                 <span>{isRahasya ? 'SURVEILLANCE' : 'DJ CONSOLE'}</span>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
@@ -462,12 +485,7 @@ export const Booking: React.FC = () => {
                                     {accommodation && (
                                         <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded text-sm">
                                             <p className="text-blue-200 mb-2">Accommodation request requires additional details:</p>
-                                            <a
-                                                href="https://forms.google.com/your-form-link"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-400 font-bold underline hover:text-blue-300 flex items-center gap-1"
-                                            >
+                                            <a href="#" className="text-blue-400 font-bold underline hover:text-blue-300 flex items-center gap-1">
                                                 Fill Accommodation Form <span aria-hidden="true">&rarr;</span>
                                             </a>
                                         </div>
