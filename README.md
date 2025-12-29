@@ -11,62 +11,65 @@ Follow these instructions to set up the project on your local machine.
 Make sure you have **Node.js** installed on your laptop.
 - Download Node.js: [https://nodejs.org/](https://nodejs.org/) (Recommended: LTS version)
 
-### 📂 Installation
+### 📂 Installation (The Only Step)
 
 1.  **Open your terminal** (Command Prompt, PowerShell, or Terminal).
 2.  **Navigate to the project root directory**.
-    - If you downloaded the folder to your `Downloads`, the command might look like:
-      ```bash
-      cd c:\Users\nikhi\Downloads\amisparkxrahasya-main
-      ```
-    - *Tip: You should be in the folder that contains `package.json`, `client`, and `server` folders.*
-
-3.  **Install Dependencies**.
-    - Run the following command in the **ROOT** folder. This will automatically install dependencies for both the `client` (frontend) and `server` (backend) because this project uses **Workspaces**.
-      ```bash
-      npm install
-      ```
+3.  **Run the Magic Command**:
+    ```bash
+    npm install
+    ```
+    > **Why just this one command?**
+    > You do **NOT** need to manually install individual packages like `three`, `framer-motion`, or `supabase`.
+    > The file `package.json` already contains a smart list of all required libraries. Running `npm install` reads this list and automatically downloads ensuring everyone uses the exact same versions.
 
 ### ▶️ Running the Application
 
-1.  **Start the Development Server**.
-    - From the same **ROOT** folder, run:
-      ```bash
-      npm run dev
-      ```
-    - This command uses `concurrently` to start both the React frontend and the backend server at the same time.
+1.  **Start the Development Server**:
+    ```bash
+    npm run dev
+    ```
+2.  **Open in Browser**:
+    Go to `http://localhost:5173`.
 
-2.  **Open in Browser**.
-    - The terminal will show you the local address (usually `http://localhost:5173` for the frontend).
-    - Open your web browser and go to that URL.
+## 📦 Tech Stack & Dependencies
 
-### 🛠️ Troubleshooting
+The project is built with a modern stack. All of these are installed automatically via `npm install`:
 
-- **"npm is not recognized"**: You probably haven't installed Node.js yet. Install it and restart your terminal.
-- **"Missing modules"**: If you get errors about missing packages (like `framer-motion`, `three`, etc.), run `npm install` again in the root folder.
-- **"EADDRINUSE"**: Something else is already running on the port. Close other terminal windows or running node processes.
+| Category | Packages | Purpose |
+|----------|----------|---------|
+| **Core** | `react`, `react-dom`, `vite` | fast frontend framework |
+| **Routing** | `react-router-dom` | Page navigation and URL management |
+| **3D & WebGL** | `three`, `@react-three/fiber`, `@react-three/drei` | The 3D Rahasya background and effects |
+| **Animation** | `framer-motion`, `gsap` | Complex page transitions and scroll effects |
+| **Styling** | `lucide-react` | Beautiful, consistent icons |
+| **Backend** | `@supabase/supabase-js` | Database connection for live bookings |
+| **Forms** | `react-hook-form`, `zod` | Validation for ticket booking forms |
+| **UX** | `lenis` | Smooth scrolling experience |
+
+## 🚧 Project Progress & Features
+
+We have successfully implemented a unified yet distinct dual-theme experience:
+
+### ✅ Latest Updates
+-   **Unified Booking System**: A single, powerful booking engine serving both themes.
+    -   **Visual Venue Map**: Interactive seat selection (Stage, Ramp, Star Circle).
+    -   **Smart Validation**: automatically restricts zones based on College (Amitian vs Non-Amitian).
+    -   **Redirection Logic**: Users accessing "Buy Tickets" from the Rahasya Noir theme are intercepted with a thematic "Transmission Intercepted" modal before being guided to the central booking terminal.
+-   **Global Navigation**: Dynamic Navbars that switch styles (Bollywood Gold vs Hacker Noir) based on the active route, with mobile menu support for both.
+
+### 🎭 Amispark (Premiere Mode)
+-   **Visuals**: Added dynamic "Stage Spotlights", paparazzi flashbulbs, and rising gold dust particles.
+-   **Vibe**: Transformed from a generic party to a high-end "Red Carpet Premiere" feel.
+
+### 🕵️‍♂️ Rahasya (Cyberpunk / Noir Mode)
+-   **3D Environment**: Integrated a 3D digital background with glitch effects.
+-   **Interactive Timeline**: A vertical, scroll-linked timeline tracking the "Rahasya" story.
+-   **Evidence Board**: A grid of events styled as classified case files.
 
 ## 📂 Project Structure
 
-- **`client/`**: Contains the React Frontend code.
-  - `pages/`: All the page components (Home, About, RahasyaTimeline, etc.).
-  - `components/`: Reusable UI components.
-- **`server/`**: Contains the Backend code.
-- **`package.json`**: The main configuration file in the root directory.
-
-## ✨ What's New (The 'Rahasya' Overhaul)
-
-We have completely upgraded the visuals and experience:
-
-### 🎭 Amispark (Premiere Mode)
-- **Visuals**: Added dynamic "Stage Spotlights", paparazzi flashbulbs, and rising gold dust particles.
-- **Vibe**: Transformed from a generic party to a high-end "Red Carpet Premiere" feel.
-
-### 🕵️‍♂️ Rahasya (Cyberpunk / Noir Mode)
-- **3D Environment**: Integrated a 3D digital background with glitch effects.
-- **New Pages**:
-  - **Classified About**: A "Dossier" style team page with redacted text and HUD elements.
-  - **Evidence Events**: A grid of "Case Files" that decrypt on hover.
-  - **Incident Log**: A vertical timeline with reticle markers and trace connections.
-- **Mobile Optimized**: Full responsiveness for the timeline and navigation menu.
-
+-   **`client/`**: Contains the React Frontend code.
+    -   `pages/`: All page components.
+    -   `components/`: Reusable UI components.
+-   **`client/package.json`**: The manifest file listing all the libraries mentioned above.
