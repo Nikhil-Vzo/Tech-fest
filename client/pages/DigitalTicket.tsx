@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, ShieldCheck, Clock, MapPin, User, AlertTriangle } from 'lucide-react';
-import { RahasyaCanvas } from '../components/RahasyaCanvas'; // Reusing 3D bg if available
+import { Check, ShieldCheck, Clock, MapPin, User, Mail, CreditCard, AlertTriangle } from 'lucide-react';
+import { RahasyaCanvas } from '../components/RahasyaCanvas';
 
 export const DigitalTicket: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [ticketData, setTicketData] = useState<any>(null);
-    const [isValid, setIsValid] = useState(false);
 
     useEffect(() => {
         const data = searchParams.get('data');
@@ -16,10 +15,8 @@ export const DigitalTicket: React.FC = () => {
                 // Decode the Base64 data from URL
                 const decoded = JSON.parse(atob(data));
                 setTicketData(decoded);
-                setIsValid(true);
             } catch (e) {
                 console.error("Invalid ticket data", e);
-                setIsValid(false);
             }
         }
     }, [searchParams]);
@@ -30,7 +27,7 @@ export const DigitalTicket: React.FC = () => {
                 <div className="text-center p-8 border border-red-500 animate-pulse">
                     <AlertTriangle className="w-12 h-12 mx-auto mb-4" />
                     <h1 className="text-2xl font-bold">INVALID TICKET DATA</h1>
-                    <p className="text-sm mt-2">Access Denied</p>
+                    <p className="text-sm mt-2">Access Denied / Corrupted Link</p>
                 </div>
             </div>
         );
@@ -79,47 +76,77 @@ export const DigitalTicket: React.FC = () => {
                         {/* Holographic Overlay Effect */}
                         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
 
-                        <div className="text-center mb-8">
-                            <p className="text-xs opacity-50 uppercase tracking-wider mb-1">Attendee</p>
-                            <h3 className="text-2xl font-bold text-white">{ticketData.attendee_name}</h3>
+                        {/* User Identity Section */}
+                        <div className="text-center mb-6">
+                            <div className={`inline-block p-1 rounded-full mb-3 border ${isRahasya ? 'border-blood bg-blood/10' : 'border-glitz-gold bg-white/10'}`}>
+                                <User className={`w-6 h-6 ${isRahasya ? 'text-blood' : 'text-glitz-gold'}`} />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white leading-tight">{ticketData.attendee_name}</h3>
                             <p className={`text-sm font-bold mt-1 ${isRahasya ? 'text-blood' : 'text-drama-light'}`}>{ticketData.college}</p>
+                            
+                            {/* NEW: Email Display */}
+                            <div className="flex items-center justify-center gap-2 mt-2 opacity-70 text-xs">
+                                <Mail className="w-3 h-3" />
+                                <span>{ticketData.attendee_email}</span>
+                            </div>
                         </div>
 
-                        <div className={`grid grid-cols-2 gap-4 text-sm p-4 rounded border ${isRahasya ? 'bg-slate-900/50 border-slate-700' : 'bg-white/5 border-white/10'}`}>
+                        {/* Details Grid */}
+                        <div className={`grid grid-cols-2 gap-y-4 gap-x-2 text-sm p-4 rounded border ${isRahasya ? 'bg-slate-900/50 border-slate-700' : 'bg-white/5 border-white/10'}`}>
+                            
+                            {/* Zone */}
+                            <div className="col-span-2 pb-2 border-b border-white/5">
+                                <p className="opacity-50 text-[10px] uppercase tracking-widest">Access Zone</p>
+                                <p className="font-bold text-white text-lg">{ticketData.zone}</p>
+                            </div>
+
+                            {/* Ticket/Order ID */}
                             <div>
-                                <p className="opacity-50 text-xs uppercase">Zone</p>
-                                <p className="font-bold text-white">{ticketData.zone}</p>
+                                <p className="opacity-50 text-[10px] uppercase tracking-widest">Ticket ID</p>
+                                <p className="font-mono font-bold text-white">{ticketData.ticket_id.split('_')[1] || ticketData.ticket_id}</p>
                             </div>
+
+                            {/* Amount Paid */}
                             <div className="text-right">
-                                <p className="opacity-50 text-xs uppercase">Order ID</p>
-                                <p className="font-mono">{ticketData.ticket_id.split('_')[1] || ticketData.ticket_id}</p>
+                                <p className="opacity-50 text-[10px] uppercase tracking-widest">Paid</p>
+                                <p className="font-mono text-green-400">₹{ticketData.amount_paid}</p>
                             </div>
-                            <div className="col-span-2 pt-2 border-t border-white/10 flex justify-between items-center">
+
+                            {/* Payment Ref (Transaction ID) */}
+                            <div className="col-span-2 pt-2 border-t border-white/5">
+                                <p className="opacity-50 text-[10px] uppercase tracking-widest flex items-center gap-1">
+                                    <CreditCard className="w-3 h-3" /> Transaction Ref
+                                </p>
+                                <p className="font-mono text-xs break-all opacity-80">{ticketData.payment_ref}</p>
+                            </div>
+
+                            {/* Timestamp & Status */}
+                            <div className="col-span-2 pt-2 mt-2 border-t border-white/10 flex justify-between items-center">
                                 <div className="flex items-center gap-2">
                                     <Clock className="w-3 h-3 opacity-50" />
-                                    <span className="opacity-70 text-xs">{new Date(ticketData.issued_at).toLocaleDateString()}</span>
+                                    <span className="opacity-70 text-xs">{new Date(ticketData.issued_at).toLocaleString()}</span>
                                 </div>
-                                <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${isRahasya ? 'border-green-500/50 text-green-500' : 'bg-green-500 text-white'}`}>
+                                <div className={`px-3 py-1 rounded text-[10px] font-bold uppercase border ${isRahasya ? 'border-green-500/50 text-green-500 bg-green-500/10' : 'bg-green-500 text-white'}`}>
                                     {ticketData.status}
                                 </div>
                             </div>
                         </div>
 
                         {/* Validated Animation */}
-                        <div className="mt-8 flex justify-center">
+                        <div className="mt-6 flex justify-center">
                             <div className={`w-full py-3 flex items-center justify-center gap-2 font-bold tracking-widest text-xs uppercase border-2 ${
                                 isRahasya 
                                 ? 'bg-green-900/20 border-green-600 text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]' 
                                 : 'bg-gradient-to-r from-glitz-gold to-drama text-white border-transparent rounded-full shadow-lg'
                             }`}>
-                                <Check className="w-4 h-4" /> Verified Entry
+                                <Check className="w-4 h-4" /> Authenticated
                             </div>
                         </div>
                     </div>
 
                     {/* Footer */}
                     <div className="p-3 bg-black/50 text-center text-[10px] opacity-40 font-mono">
-                        ID: {ticketData.ticket_id} | SECURE HASH
+                        SECURE TICKET | DO NOT SHARE
                     </div>
                 </div>
             </motion.div>
