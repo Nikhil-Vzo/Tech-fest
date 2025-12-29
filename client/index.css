@@ -76,8 +76,8 @@
 
 .venue-grid {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: repeat(13, 50px);
+    grid-template-columns: repeat(12, minmax(40px, 1fr));
+    grid-template-rows: repeat(13, 60px);
     gap: 12px;
     max-width: 800px;
     margin: 20px auto;
@@ -395,4 +395,28 @@ html.lenis body {
 
 .lenis.lenis-scrolling iframe {
     pointer-events: none;
+}
+
+@keyframes swipe {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-10px);
+    }
+}
+
+@keyframes fadeInOut {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }

@@ -59,9 +59,10 @@ export const Booking: React.FC = () => {
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [accommodation, setAccommodation] = useState(false);
 
-    // Email Verification State
+    // Email/ID Verification State
     const [verificationEmail, setVerificationEmail] = useState('');
-    const [isEmailVerified, setIsEmailVerified] = useState(false);
+    const [verificationId, setVerificationId] = useState(''); // New state for ID card
+    const [isVerified, setIsVerified] = useState(false); // Renamed from isEmailVerified to generic isVerified
     const [isVerifying, setIsVerifying] = useState(false);
 
     const { register, handleSubmit, formState: { errors }, watch } = useForm<AttendeeFormData>({
@@ -106,35 +107,55 @@ export const Booking: React.FC = () => {
         setStep(3);
         setTicketCount(1);
         setAccommodation(false); // Reset accommodation
-        setIsEmailVerified(false); // Reset verification
+        setTicketCount(1);
+        setAccommodation(false); // Reset accommodation
+        setIsVerified(false); // Reset verification
         setVerificationEmail('');
+        setVerificationId('');
     };
 
-    const handleVerifyEmail = () => {
-        if (!verificationEmail) {
-            setToast({ message: "Please enter your college email.", type: 'error' });
-            setTimeout(() => setToast(null), 3000);
-            return;
-        }
-
-        setIsVerifying(true);
-        // Mock verification logic
-        setTimeout(() => {
-            setIsVerifying(false);
-            if (verificationEmail.toLowerCase().includes('amity')) {
-                setIsEmailVerified(true);
-                setToast({ message: "Email verified successfully!", type: 'success' });
+    const handleVerify = () => {
+        if (isAmity) {
+            // Amity Email Verification
+            if (!verificationEmail) {
+                setToast({ message: "Please enter your college email.", type: 'error' });
                 setTimeout(() => setToast(null), 3000);
-            } else {
-                setToast({ message: "Invalid Amity email address.", type: 'error' });
-                setTimeout(() => setToast(null), 3000);
+                return;
             }
-        }, 1000);
+
+            setIsVerifying(true);
+            setTimeout(() => {
+                setIsVerifying(false);
+                if (verificationEmail.toLowerCase().includes('amity')) {
+                    setIsVerified(true);
+                    setToast({ message: "Email verified successfully!", type: 'success' });
+                    setTimeout(() => setToast(null), 3000);
+                } else {
+                    setToast({ message: "Invalid Amity email address.", type: 'error' });
+                    setTimeout(() => setToast(null), 3000);
+                }
+            }, 1000);
+        } else {
+            // Non-Amity ID Verification
+            if (!verificationId || verificationId.length < 3) {
+                setToast({ message: "Please enter a valid College ID Card No.", type: 'error' });
+                setTimeout(() => setToast(null), 3000);
+                return;
+            }
+
+            setIsVerifying(true);
+            setTimeout(() => {
+                setIsVerifying(false);
+                setIsVerified(true);
+                setToast({ message: "ID verified successfully!", type: 'success' });
+                setTimeout(() => setToast(null), 3000);
+            }, 1000);
+        }
     };
 
     const handlePayment = () => {
-        if (isAmity && !isEmailVerified) {
-            setToast({ message: "Please verify your college email first.", type: 'error' });
+        if (!isVerified) {
+            setToast({ message: isAmity ? "Please verify your college email." : "Please verify your college ID.", type: 'error' });
             setTimeout(() => setToast(null), 3000);
             return;
         }
@@ -198,6 +219,21 @@ export const Booking: React.FC = () => {
                             {s < 4 && <div className={`w-16 h-1 ${step > s ? (isRahasya ? 'bg-blood' : 'bg-drama') : (isRahasya ? 'bg-slate-800' : 'bg-bollywood-800')}`} />}
                         </div>
                     ))}
+                </div>
+
+                {/* Important Booking Rules Banner */}
+                <div className={`mb-8 p-4 rounded border-l-4 ${isRahasya ? 'bg-red-950/40 border-blood text-red-200' : 'bg-amber-900/40 border-amber-500 text-amber-100'}`}>
+                    <div className="flex items-start">
+                        <AlertCircle className="w-6 h-6 mr-3 flex-shrink-0 mt-0.5" />
+                        <div>
+                            <h3 className="font-bold uppercase mb-1">Important Booking Rules</h3>
+                            <ul className="list-disc list-inside text-sm space-y-1 opacity-90">
+                                <li>Purchase your ticket using <strong>ONLY your personal College ID</strong>.</li>
+                                <li><strong>One ID Card = One Ticket</strong> only.</li>
+                                <li>Using another student's ID is <strong>strictly forbidden</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -285,67 +321,87 @@ export const Booking: React.FC = () => {
                                         </Button>
                                     </div>
                                 ) : (
-                                    <div className={`venue-grid ${isRahasya ? 'venue-noir' : 'venue-bollywood'}`}>
-                                        {/* Stage */}
-                                        <div className={`venue-area area-stage-top ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
-                                            <span>{isRahasya ? 'MAIN TERMINAL' : 'STAGE'}</span>
-                                        </div>
-                                        <div className={`venue-area area-stage-bottom ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
-                                            <span>{isRahasya ? 'ACCESS TUNNEL' : 'RAMP'}</span>
-                                        </div>
+                                    <>
+                                        {/* Mobile Scroll Visuals */}
+                                        <div className="relative">
+                                            {/* Gradient Mask on Right to indicate scrollable content */}
+                                            <div className="lg:hidden absolute top-0 right-0 bottom-0 w-12 bg-gradient-to-l from-black/80 to-transparent z-10 pointer-events-none" />
 
-                                        {/* Areas */}
-                                        {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'forensics' : 'tech-fest')).map(tier => (
-                                            <div key={tier.id} className={`venue-area area-techfest ${isRahasya ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-purple-900/40 border-purple-500/30 hover:bg-purple-900/60'} ${isTierLocked(tier) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`} onClick={() => handleTierSelect(tier)}>
-                                                <span>{tier.name}</span>
-                                                <div className="area-info">
-                                                    <p className="font-bold">₹{tier.basePrice + 300}</p>
-                                                    <p className="text-xs">{tier.available} / {tier.capacity} Seats</p>
-                                                    {isTierLocked(tier) && <Lock className="w-4 h-4 mt-1" />}
+                                            {/* Animated Hand Icon Hint */}
+                                            <div className="lg:hidden absolute inset-0 z-20 pointer-events-none flex items-center justify-center opacity-0 animate-[fadeInOut_3s_ease-in-out_infinite]">
+                                                <div className="bg-black/80 rounded-xl px-6 py-3 backdrop-blur-md border border-white/10 flex flex-col items-center gap-2 shadow-2xl">
+                                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white animate-[swipe_1.5s_ease-in-out_infinite]">
+                                                        <path d="M18 11.5C18 10.1193 16.8807 9 15.5 9C14.1193 9 13 10.1193 13 11.5V11.72C12.78 11.57 12.52 11.5 12.25 11.5C11.0074 11.5 10 12.5074 10 13.75V14H9.5C8.11929 14 7 15.1193 7 16.5C7 17.8807 8.11929 19 9.5 19H15.5C16.8807 19 18 17.8807 18 16.5V11.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    </svg>
+                                                    <span className="text-white/90 text-sm font-medium whitespace-nowrap">Swipe to explore</span>
                                                 </div>
                                             </div>
-                                        ))}
 
-                                        {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'high-command' : 'faculty')).map(tier => (
-                                            <div key={tier.id} className={`venue-area area-faculty ${isRahasya ? 'bg-red-950 border-red-900/50 cursor-not-allowed text-red-800' : 'bg-red-900/40 border-red-500/30 cursor-not-allowed'}`} onClick={() => handleTierSelect(tier)}>
-                                                <span>{tier.name}</span>
-                                                <div className="absolute top-2 right-2"><Lock className="w-4 h-4" /></div>
-                                            </div>
-                                        ))}
+                                            <div className="overflow-x-auto py-4">
+                                                <div className={`venue-grid ${isRahasya ? 'venue-noir' : 'venue-bollywood'} min-w-[600px]`}>
+                                                    {/* Stage */}
+                                                    <div className={`venue-area area-stage-top ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
+                                                        <span>{isRahasya ? 'MAIN TERMINAL' : 'STAGE'}</span>
+                                                    </div>
+                                                    <div className={`venue-area area-stage-bottom ${isRahasya ? 'bg-slate-800 border-slate-700' : 'bg-drama-dark border-drama'}`}>
+                                                        <span>{isRahasya ? 'ACCESS TUNNEL' : 'RAMP'}</span>
+                                                    </div>
 
-                                        {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'inner-circle' : 'fanpit')).map(tier => (
-                                            <div key={tier.id} className={`venue-area area-fanpit ${isRahasya ? 'bg-black border-slate-600 text-white' : 'bg-pink-900/40 border-pink-500/30 hover:bg-pink-900/60'} ${isTierLocked(tier) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`} onClick={() => handleTierSelect(tier)}>
-                                                <span>{tier.name}</span>
-                                                <div className="area-info">
-                                                    <p className="font-bold">₹{tier.basePrice + 300}</p>
-                                                    <p className="text-xs">{tier.available} / {tier.capacity} Seats</p>
-                                                    {isTierLocked(tier) && <Lock className="w-4 h-4 mt-1" />}
+                                                    {/* Areas */}
+                                                    {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'forensics' : 'tech-fest')).map(tier => (
+                                                        <div key={tier.id} className={`venue-area area-techfest ${isRahasya ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-purple-900/40 border-purple-500/30 hover:bg-purple-900/60'} ${isTierLocked(tier) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`} onClick={() => handleTierSelect(tier)}>
+                                                            <span>{tier.name}</span>
+                                                            <div className="area-info">
+                                                                <p className="font-bold">₹{tier.basePrice + 300}</p>
+                                                                <p className="text-xs">{tier.available} / {tier.capacity} Seats</p>
+                                                                {isTierLocked(tier) && <Lock className="w-4 h-4 mt-1" />}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+
+                                                    {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'high-command' : 'faculty')).map(tier => (
+                                                        <div key={tier.id} className={`venue-area area-faculty ${isRahasya ? 'bg-red-950 border-red-900/50 cursor-not-allowed text-red-800' : 'bg-red-900/40 border-red-500/30 cursor-not-allowed'}`} onClick={() => handleTierSelect(tier)}>
+                                                            <span>{tier.name}</span>
+                                                            <div className="absolute top-2 right-2"><Lock className="w-4 h-4" /></div>
+                                                        </div>
+                                                    ))}
+
+                                                    {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'inner-circle' : 'fanpit')).map(tier => (
+                                                        <div key={tier.id} className={`venue-area area-fanpit ${isRahasya ? 'bg-black border-slate-600 text-white' : 'bg-pink-900/40 border-pink-500/30 hover:bg-pink-900/60'} ${isTierLocked(tier) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`} onClick={() => handleTierSelect(tier)}>
+                                                            <span>{tier.name}</span>
+                                                            <div className="area-info">
+                                                                <p className="font-bold">₹{tier.basePrice + 300}</p>
+                                                                <p className="text-xs">{tier.available} / {tier.capacity} Seats</p>
+                                                                {isTierLocked(tier) && <Lock className="w-4 h-4 mt-1" />}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+
+                                                    {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'general-pop' : 'general')).map(tier => (
+                                                        <div key={tier.id} className={`venue-area area-general ${isRahasya ? 'bg-slate-800 border-slate-600 text-slate-400' : 'bg-indigo-900/40 border-indigo-500/30 hover:bg-indigo-900/60'} ${isTierLocked(tier) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`} onClick={() => handleTierSelect(tier)}>
+                                                            <span>{tier.name}</span>
+                                                            <div className="area-info">
+                                                                <p className="font-bold">₹{tier.basePrice + 300}</p>
+                                                                <p className="text-xs">{tier.available} / {tier.capacity} Seats</p>
+                                                                {isTierLocked(tier) && <Lock className="w-4 h-4 mt-1" />}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+
+                                                    {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'supply-depot' : 'food')).map(tier => (
+                                                        <div key={tier.id} className={`venue-area area-food ${isRahasya ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-orange-900/40 border-orange-500/30'}`}>
+                                                            <span>{tier.name}</span>
+                                                        </div>
+                                                    ))}
+
+                                                    {/* DJ / Control */}
+                                                    <div className={`venue-area area-dj ${isRahasya ? 'bg-slate-900 border-slate-700' : 'bg-black border-drama'}`}>
+                                                        <span>{isRahasya ? 'SURVEILLANCE' : 'DJ CONSOLE'}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        ))}
-
-                                        {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'general-pop' : 'general')).map(tier => (
-                                            <div key={tier.id} className={`venue-area area-general ${isRahasya ? 'bg-slate-800 border-slate-600 text-slate-400' : 'bg-indigo-900/40 border-indigo-500/30 hover:bg-indigo-900/60'} ${isTierLocked(tier) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`} onClick={() => handleTierSelect(tier)}>
-                                                <span>{tier.name}</span>
-                                                <div className="area-info">
-                                                    <p className="font-bold">₹{tier.basePrice + 300}</p>
-                                                    <p className="text-xs">{tier.available} / {tier.capacity} Seats</p>
-                                                    {isTierLocked(tier) && <Lock className="w-4 h-4 mt-1" />}
-                                                </div>
-                                            </div>
-                                        ))}
-
-                                        {TICKET_TIERS.filter(t => t.id === (isRahasya ? 'supply-depot' : 'food')).map(tier => (
-                                            <div key={tier.id} className={`venue-area area-food ${isRahasya ? 'bg-slate-900 border-slate-800 text-slate-500' : 'bg-orange-900/40 border-orange-500/30'}`}>
-                                                <span>{tier.name}</span>
-                                            </div>
-                                        ))}
-
-                                        {/* DJ / Control */}
-                                        <div className={`venue-area area-dj ${isRahasya ? 'bg-slate-900 border-slate-700' : 'bg-black border-drama'}`}>
-                                            <span>{isRahasya ? 'SURVEILLANCE' : 'DJ CONSOLE'}</span>
                                         </div>
-                                    </div>
+                                    </>
                                 )}
 
                             </Card>
@@ -386,8 +442,9 @@ export const Booking: React.FC = () => {
                                         <span className="font-bold">+ ₹300</span>
                                     </div>
 
-                                    {/* Accommodation Checkbox for Non-Amity */}
-                                    {!isAmity && selectedTier.id === 'tech-fest' && (
+                                    {/* Accommodation Checkbox for All Students */}
+                                    {/* Show for Tech Bazaar (External) OR Any Amity Booking */}
+                                    {(selectedTier.id === 'tech-fest' || isAmity) && (
                                         <div className="border-t border-white/10 pt-4 mt-4">
                                             <div className="mb-4 p-3 bg-blue-900/20 border border-blue-500/30 rounded text-sm">
                                                 <p className="mb-2">Looking for accommodation?</p>
@@ -418,31 +475,41 @@ export const Booking: React.FC = () => {
                                     </div>
                                 </div>
 
-                                {/* Email Verification for Amity */}
-                                {isAmity && (
-                                    <div className="mb-6 border-t border-white/10 pt-4">
-                                        <h4 className="font-bold mb-3">College Verification</h4>
-                                        <div className="flex gap-2">
+                                {/* Verification Section (Email for Amity, ID for others) */}
+                                <div className="mb-6 border-t border-white/10 pt-4">
+                                    <h4 className="font-bold mb-3">{isAmity ? 'College Email Verification' : 'Student Identity Verification'}</h4>
+                                    <div className="flex gap-2">
+                                        {isAmity ? (
                                             <Input
-                                                placeholder="Enter Amity Email ID"
+                                                placeholder="Amity Email ID"
                                                 value={verificationEmail}
                                                 onChange={(e) => setVerificationEmail(e.target.value)}
-                                                className={`flex-1 ${isRahasya ? 'bg-slate-900 border-slate-700' : ''}`}
-                                                disabled={isEmailVerified}
+                                                className={`flex-1 min-w-0 ${isRahasya ? 'bg-slate-900 border-slate-700' : ''}`}
+                                                disabled={isVerified}
                                             />
-                                            <Button
-                                                onClick={handleVerifyEmail}
-                                                disabled={isEmailVerified || isVerifying}
-                                                className={`${isEmailVerified ? 'bg-green-600' : 'bg-blue-600'} text-white px-4`}
-                                            >
-                                                {isVerifying ? '...' : isEmailVerified ? <Check className="w-4 h-4" /> : 'Verify'}
-                                            </Button>
-                                        </div>
-                                        {isEmailVerified && <p className="text-green-500 text-xs mt-1">Verified successfully</p>}
+                                        ) : (
+                                            <Input
+                                                placeholder="College ID No."
+                                                value={verificationId}
+                                                onChange={(e) => setVerificationId(e.target.value)}
+                                                className={`flex-1 min-w-0 ${isRahasya ? 'bg-slate-900 border-slate-700' : ''}`}
+                                                disabled={isVerified}
+                                            />
+                                        )}
+                                        <Button
+                                            onClick={handleVerify}
+                                            disabled={isVerified || isVerifying}
+                                            className={`${isVerified ? 'bg-green-600' : 'bg-blue-600'} text-white px-4`}
+                                        >
+                                            {isVerifying ? '...' : isVerified ? <Check className="w-4 h-4" /> : 'Verify'}
+                                        </Button>
                                     </div>
-                                )}
+                                    {isVerified && <p className="text-green-500 text-xs mt-1">
+                                        {isAmity ? "Email verified successfully" : "ID verified successfully"}
+                                    </p>}
+                                </div>
 
-                                <Button onClick={handlePayment} variant="primary" className={`w-full ${isRahasya ? 'bg-blood hover:bg-red-700' : 'bg-drama hover:bg-drama-light'}`} disabled={isAmity && !isEmailVerified}>
+                                <Button onClick={handlePayment} variant="primary" className={`w-full ${isRahasya ? 'bg-blood hover:bg-red-700' : 'bg-drama hover:bg-drama-light'}`} disabled={!isVerified}>
                                     <CreditCard className="w-4 h-4 mr-2 inline" />
                                     Pay Now
                                 </Button>

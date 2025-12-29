@@ -51,7 +51,7 @@ const Flashbulb = () => {
             transition={{
                 duration: 0.2,
                 repeat: Infinity,
-                repeatDelay: Math.random() * 3 + 1, // Faster flashes (1-4s)
+                repeatDelay: Math.random() * 2 + 0.5, // Faster flashes (0.5-2.5s)
                 ease: "easeOut"
             }}
         />
@@ -92,7 +92,7 @@ export const AmisparkFloatingIcons: React.FC = () => {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {/* Spotlights - Instant Start */}
             <Spotlight position="left" delay={0} color="var(--color-drama)" />
-            <Spotlight position="right" delay={1} color="var(--color-glitz-gold)" />
+            <Spotlight position="right" delay={0.2} color="var(--color-glitz-gold)" />
 
             {/* Flashbulbs - Paparazzi Effect (Increased Count) */}
             {[...Array(12)].map((_, i) => (

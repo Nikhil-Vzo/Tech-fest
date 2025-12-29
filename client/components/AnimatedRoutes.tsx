@@ -33,7 +33,7 @@ export const AnimatedRoutes: React.FC = () => {
                 <Routes location={location} key={location.pathname}>
                     <Route path="*" element={
                         <PageWrapper isRahasya={isRahasya}>
-                            <Suspense fallback={<LoadingSpinner />}>
+                            <Suspense fallback={null}>
                                 <Routes location={location}>
                                     <Route path="/" element={<Home />} />
                                     <Route path="/about" element={<About />} />
