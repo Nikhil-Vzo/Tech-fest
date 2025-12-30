@@ -1,17 +1,39 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Check, Home, AlertTriangle } from 'lucide-react';
+import { Check, Home, Download, Mail, User, ShieldCheck, MapPin, AlertCircle } from 'lucide-react';
 import { Card, Button } from '../components/UIComponents';
 import QRCode from "react-qr-code";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import Confetti from 'react-confetti';
+
+function useWindowSize() {
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+
+    useEffect(() => {
+        function handleResize() {
+            setWindowSize({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        }
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+    return windowSize;
+}
 
 export const Receipt: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const receiptRef = useRef<HTMLDivElement>(null);
+    const { width, height } = useWindowSize();
     
-    // Retrieve data passed from Booking page
     const { paymentId, orderId, amount, items, user, verificationId } = location.state || {};
 
-    // Fallback if accessed directly without data
     if (!paymentId) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -24,8 +46,9 @@ export const Receipt: React.FC = () => {
     }
 
     const isRahasya = location.pathname.includes('/rahasya');
+    const bollywoodColors = ['#FFD700', '#FF69B4', '#8A2BE2', '#00FFFF', '#FFA500', '#ffffff'];
+    const rahasyaColors = ['#dc2626', '#7f1d1d', '#000000', '#333333', '#ffffff'];
 
-    // 1. Create the data object - WITH VERIFICATION ID
     const ticketRawData = {
         event: "AMISPARK x RAHASYA 2026",
         ticket_id: orderId,
@@ -33,104 +56,132 @@ export const Receipt: React.FC = () => {
         attendee_name: `${user?.firstName} ${user?.lastName}`,
         attendee_email: user?.email,
         college: user?.college,
-        verification_id: verificationId, // Ensuring this is passed
+        verification_id: verificationId,
         zone: items?.join(', '),
         amount_paid: amount,
         status: "CONFIRMED",
         is_rahasya: isRahasya,
         issued_at: new Date().toISOString()
     };
-
-    // 2. Encode it for the URL (Base64)
     const encodedData = btoa(JSON.stringify(ticketRawData));
-    
-    // 3. Construct the Full URL
     const qrUrl = `${window.location.origin}/#/ticket-view?data=${encodedData}`;
 
-    return (
-        <div className={`min-h-screen py-24 px-4 ${isRahasya ? 'bg-noir-900 text-slate-300 font-mono' : 'bg-bollywood-900 text-glitz-paper font-body'}`}>
-            <div className="container mx-auto max-w-2xl">
+    const handleDownload = async () => {
+        if (receiptRef.current) {
+            setTimeout(async () => {
+                const element = receiptRef.current!;
+                const canvas = await html2canvas(element, {
+                    backgroundColor: isRahasya ? '#0c0c0c' : '#1a0b2e',
+                    scale: 2,
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const imgProps = pdf.getImageProperties(imgData);
+                const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                const yPosition = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
                 
-                <Card className={`p-8 text-center ${isRahasya ? 'bg-black/40 border-green-900' : 'bg-bollywood-800 border-green-500/30'}`}>
-                    
-                    {/* Success Icon */}
-                    <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/50">
-                        <Check className="w-10 h-10 text-green-500" />
-                    </div>
+                pdf.addImage(imgData, 'PNG', 0, yPosition, pdfWidth, imgHeight);
+                pdf.save(`Amispark_Ticket_${orderId}.pdf`);
+            }, 500);
+        }
+    };
 
-                    <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${isRahasya ? 'font-special-elite text-white' : 'font-display text-white'}`}>
-                        PAYMENT SUCCESSFUL
-                    </h1>
-                    <p className="text-lg opacity-80 mb-8">Transaction ID: {paymentId}</p>
+    return (
+        <div className={`min-h-screen relative overflow-hidden flex items-center justify-center py-12 px-4 ${isRahasya ? 'bg-noir-900 text-slate-300 font-mono' : 'bg-bollywood-900 text-glitz-paper font-body'}`}>
+            
+            <Confetti
+                width={width}
+                height={height}
+                colors={isRahasya ? rahasyaColors : bollywoodColors}
+                recycle={false}
+                numberOfPieces={800}
+                gravity={0.2}
+                className="z-0 pointer-events-none"
+            />
 
-                    {/* QR Code Section */}
-                    <div className="flex flex-col items-center justify-center mb-8">
-                        <div className="bg-white p-4 rounded-lg shadow-lg">
-                            <QRCode 
-                                value={qrUrl}
-                                size={180}
-                                level="M"
-                                fgColor="#000000"
-                                bgColor="#ffffff"
-                            />
-                        </div>
-                        <p className="mt-4 text-xs font-mono opacity-50 uppercase tracking-widest">
-                            Scan to View Digital Ticket
-                        </p>
-                    </div>
+            <div className="container mx-auto max-w-2xl relative z-10">
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-gradient-to-r blur-3xl opacity-30 pointer-events-none -z-10 ${isRahasya ? 'from-red-900 via-black to-red-900' : 'from-purple-600 via-pink-600 to-blue-600'}`}></div>
 
-                    {/* Receipt Details */}
-                    <div className={`text-left p-6 rounded-lg mb-8 ${isRahasya ? 'bg-slate-900 border border-slate-700' : 'bg-black/20 border border-white/10'}`}>
-                        <div className="flex justify-between mb-4 border-b border-white/10 pb-4">
-                            <span className="opacity-70">Amount Paid</span>
-                            <span className="font-bold text-xl text-green-400">₹{amount}</span>
-                        </div>
+                <div id="receipt-card"> 
+                    <Card ref={receiptRef} className={`p-8 text-center relative overflow-hidden shadow-2xl ${isRahasya ? 'bg-black/90 border-red-900/50 shadow-red-900/20' : 'bg-bollywood-800/95 border-drama/50 shadow-drama/30'}`}>
                         
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="opacity-70">Order ID</span>
-                                <span>{orderId}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="opacity-70">Name</span>
-                                <span>{user?.firstName} {user?.lastName}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="opacity-70">Email</span>
-                                <span>{user?.email}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="opacity-70">Verification ID</span>
-                                <span className="font-mono text-xs">{verificationId || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="opacity-70">Items</span>
-                                <span>{items?.join(', ')}</span>
+                        <div className="mb-6 relative inline-block">
+                            <div className={`absolute inset-0 rounded-full animate-ping opacity-75 ${isRahasya ? 'bg-red-600' : 'bg-green-500'}`}></div>
+                            <div className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center mx-auto border-2 bg-black/30 backdrop-blur-sm ${isRahasya ? 'border-red-500 text-red-500' : 'border-green-500 text-green-500'}`}>
+                                <Check className="w-10 h-10" />
                             </div>
                         </div>
-                    </div>
 
-                    {/* Important Warning */}
-                    <div className={`p-4 mb-8 text-left text-sm border-l-4 ${isRahasya ? 'bg-yellow-900/20 border-yellow-600 text-yellow-500' : 'bg-yellow-500/10 border-yellow-500 text-yellow-200'}`}>
-                        <div className="flex items-start gap-3">
-                            <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
-                            <div>
-                                <p className="font-bold mb-1">IMPORTANT:</p>
-                                <p>The ticket is mailed to your given email id ({user?.email}).</p>
-                                <p className="mt-1 font-bold text-red-400">DO NOT TRY TO SCAN THE QR CODE YOURSELF.</p>
-                                <p className="opacity-80 text-xs mt-1">Scanning it yourself will mark it as logged in, and you may be denied entry at the gate.</p>
+                        <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${isRahasya ? 'font-special-elite text-red-500' : 'font-display text-transparent bg-clip-text bg-gradient-to-r from-glitz-gold via-white to-glitz-gold'}`}>
+                            {isRahasya ? 'ACCESS GRANTED' : "YOU'RE IN!"}
+                        </h1>
+                        <p className="text-lg opacity-80 mb-6">See you at the fest!</p>
+
+                        {/* --- NEW: MAIL NOTIFICATION --- */}
+                        <div className={`mb-8 p-4 rounded-lg border flex flex-col items-center gap-2 ${isRahasya ? 'bg-red-900/10 border-red-800 text-red-200' : 'bg-indigo-900/30 border-indigo-400/30 text-indigo-100'}`}>
+                            <div className="flex items-center gap-2 font-bold text-lg">
+                                <Mail className="w-5 h-5" /> Ticket Sent to Email
+                            </div>
+                            <p className="text-sm opacity-80 text-center px-4">
+                                Your official entry pass has been mailed to <span className="font-bold underline">{user?.email}</span>.
+                            </p>
+                            <div className={`mt-2 text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full flex items-center gap-2 ${isRahasya ? 'bg-red-500/20 text-red-300' : 'bg-white/20 text-white'}`}>
+                                <AlertCircle className="w-3 h-3" /> QR will be scanned at the gate
                             </div>
                         </div>
-                    </div>
 
-                    {/* Footer Actions - REMOVED DOWNLOAD BUTTON */}
-                    <div className="flex flex-col md:flex-row gap-4 justify-center">
-                        <Button onClick={() => navigate('/')} className="flex items-center gap-2 justify-center w-full md:w-auto">
-                            <Home className="w-4 h-4" /> Return to Home
-                        </Button>
-                    </div>
+                        {/* QR Code (Still visible for reference/testing) */}
+                        <div className={`inline-block mb-8 p-4 rounded-xl border backdrop-blur-sm ${isRahasya ? 'bg-red-950/30 border-red-900/50' : 'bg-white/10 border-white/20'}`}>
+                            <div className="bg-white p-3 rounded-lg shadow-lg">
+                                <QRCode value={qrUrl} size={150} level="M" />
+                            </div>
+                            <p className="mt-2 text-[10px] font-bold opacity-70 uppercase tracking-widest">Instant Receipt Copy</p>
+                        </div>
 
-                </Card>
+                        {/* Details */}
+                        <div className={`text-left p-6 rounded-lg mb-8 text-sm space-y-3 ${isRahasya ? 'bg-slate-900/80 border border-slate-700' : 'bg-black/30 border border-white/10'}`}>
+                            <div className="flex justify-between items-center border-b border-white/10 pb-3 mb-3">
+                                <span className="opacity-70">Amount Paid</span>
+                                <span className={`font-bold text-xl ${isRahasya ? 'text-red-400' : 'text-green-400'}`}>₹{amount}</span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="opacity-60 flex items-center gap-2"><User className="w-3 h-3" /> Name</span>
+                                    <span className="font-bold">{user?.firstName} {user?.lastName}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="opacity-60 flex items-center gap-2"><Mail className="w-3 h-3" /> Email</span>
+                                    <span className="truncate max-w-[200px]">{user?.email}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="opacity-60 flex items-center gap-2"><ShieldCheck className="w-3 h-3" /> Verify ID</span>
+                                    <span className="font-mono bg-white/10 px-2 py-0.5 rounded text-xs">{verificationId || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="opacity-60 flex items-center gap-2"><MapPin className="w-3 h-3" /> Access Zone</span>
+                                    <span className="font-bold text-drama-light">{items?.join(', ')}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-2 border-t border-white/5 mt-2">
+                                    <span className="opacity-50 text-xs">Order Ref</span>
+                                    <span className="font-mono text-xs opacity-70">{orderId}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row gap-4 justify-center relative z-20">
+                            <Button onClick={() => navigate('/')} className="flex items-center gap-2 justify-center w-full md:w-auto order-2 md:order-1 opacity-80 hover:opacity-100">
+                                <Home className="w-4 h-4" /> Home
+                            </Button>
+                            <Button onClick={handleDownload} className={`flex items-center gap-2 justify-center w-full md:w-auto order-1 md:order-2 font-bold py-3 px-8 shadow-lg transform hover:-translate-y-1 transition-all ${isRahasya ? 'bg-red-700 hover:bg-red-600 shadow-red-900/30' : 'bg-gradient-to-r from-drama to-purple-600 hover:from-drama-light hover:to-purple-500 shadow-purple-900/30'}`}>
+                                <Download className="w-5 h-5" /> Download PDF Receipt
+                            </Button>
+                        </div>
+
+                    </Card>
+                </div>
             </div>
         </div>
     );
