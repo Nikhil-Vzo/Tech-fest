@@ -184,16 +184,58 @@ export const Booking: React.FC = () => {
                     amount_paid: amount,
                     status: 'CONFIRMED',
                     is_rahasya: isRahasya,
-                    verification_id: verificationInput, // Saving the ID used for verification
+                    verification_id: verificationInput,
                     created_at: new Date().toISOString()
                 }
             ]);
 
         if (error) {
             console.error('Database Error:', error);
-            // We proceed with UI flow even if DB log fails for demo purposes
         }
         return true;
+    };
+
+    // --- EMAIL TRIGGER FUNCTION ---
+    const sendConfirmationEmail = async (pId: string, oId: string, amount: number) => {
+        if (!userData || !selectedTier) return;
+
+        // Reconstruct the Ticket Data URL used in the QR Code
+        const ticketRawData = {
+            event: "AMISPARK x RAHASYA 2026",
+            ticket_id: oId,
+            payment_ref: pId,
+            attendee_name: `${userData.firstName} ${userData.lastName}`,
+            attendee_email: userData.email,
+            college: userData.college,
+            verification_id: verificationInput,
+            zone: selectedTier.name,
+            amount_paid: amount,
+            status: "CONFIRMED",
+            is_rahasya: isRahasya,
+            issued_at: new Date().toISOString()
+        };
+        const encodedData = btoa(JSON.stringify(ticketRawData));
+        const qrLink = `${window.location.origin}/#/ticket-view?data=${encodedData}`;
+
+        try {
+            // Call the local backend server
+            await fetch('http://localhost:5000/api/send-ticket', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: userData.email,
+                    name: `${userData.firstName} ${userData.lastName}`,
+                    ticketId: oId,
+                    zone: selectedTier.name,
+                    amount: amount,
+                    qrLink: qrLink,
+                    isRahasya: isRahasya
+                })
+            });
+            console.log("Email request sent to server");
+        } catch (error) {
+            console.error("Failed to send email trigger", error);
+        }
     };
 
     // --- PAYMENT INTEGRATION ---
@@ -216,8 +258,13 @@ export const Booking: React.FC = () => {
 
         // Shared Success Handler
         const onPaymentSuccess = async (pId: string, oId: string) => {
+            // 1. Save to Database
             await saveBookingToSupabase(pId, oId, totalAmount);
             
+            // 2. Trigger Email (Fire and Forget - don't await blocking)
+            sendConfirmationEmail(pId, oId, totalAmount);
+
+            // 3. Navigate to Receipt
             const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
             navigate(targetPath, {
                 state: {
@@ -226,7 +273,7 @@ export const Booking: React.FC = () => {
                     amount: totalAmount,
                     items: [selectedTier.name, accommodation ? "Accommodation" : null].filter(Boolean),
                     user: userData,
-                    verificationId: verificationInput // PASSING EXISTING INPUT
+                    verificationId: verificationInput
                 }
             });
             setIsPaying(false);
