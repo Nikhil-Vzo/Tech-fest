@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, ShieldCheck, Clock, MapPin, User, Mail, CreditCard, AlertTriangle, Fingerprint } from 'lucide-react';
+import { Check, ShieldCheck, Clock, Mail, AlertTriangle, Fingerprint, History, AlertCircle } from 'lucide-react';
 import { RahasyaCanvas } from '../components/RahasyaCanvas';
+import { supabase } from '../src/supabaseClient';
 
 export const DigitalTicket: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [ticketData, setTicketData] = useState<any>(null);
+    const [scanHistory, setScanHistory] = useState<any[]>([]);
+    const [loadingHistory, setLoadingHistory] = useState(true);
+    const logAttempted = useRef(false);
 
+    // 1. Decode Data
     useEffect(() => {
         const data = searchParams.get('data');
         if (data) {
@@ -19,6 +24,39 @@ export const DigitalTicket: React.FC = () => {
             }
         }
     }, [searchParams]);
+
+    // 2. Log Scan & Fetch History
+    useEffect(() => {
+        const handleScanLogic = async () => {
+            if (!ticketData?.ticket_id) return;
+
+            // A. Log the current scan (only once per page load)
+            if (!logAttempted.current) {
+                logAttempted.current = true;
+                await supabase.from('ticket_scans').insert({
+                    ticket_id: ticketData.ticket_id,
+                    scanned_at: new Date().toISOString(),
+                    device_info: navigator.userAgent
+                });
+            }
+
+            // B. Fetch total history for this ticket
+            const { data, error } = await supabase
+                .from('ticket_scans')
+                .select('*')
+                .eq('ticket_id', ticketData.ticket_id)
+                .order('scanned_at', { ascending: false }); // Newest first
+
+            if (data) {
+                setScanHistory(data);
+            }
+            setLoadingHistory(false);
+        };
+
+        if (ticketData) {
+            handleScanLogic();
+        }
+    }, [ticketData]);
 
     if (!ticketData) {
         return (
@@ -32,8 +70,9 @@ export const DigitalTicket: React.FC = () => {
         );
     }
 
-    // Force Rahasya theme if data suggests it, or if it's explicitly set
     const isRahasya = ticketData.is_rahasya || (ticketData.event && ticketData.event.includes('RAHASYA'));
+    const scanCount = scanHistory.length;
+    const isReused = scanCount > 1;
 
     const formattedDate = new Date(ticketData.issued_at).toLocaleString('en-US', {
         day: 'numeric', month: 'short', year: 'numeric',
@@ -41,23 +80,18 @@ export const DigitalTicket: React.FC = () => {
     });
 
     return (
-        // Main Container: Set background color here
         <div className={`min-h-screen flex items-center justify-center p-4 overflow-hidden relative ${isRahasya ? 'bg-noir-900 font-mono text-slate-300' : 'bg-bollywood-900 font-body text-glitz-paper'}`}>
             
-            {/* LAYER 0: 3D Background (Rahasya Only) */}
             {isRahasya && (
                 <div className="fixed inset-0 z-0 pointer-events-none">
-                    {/* Ensure RahasyaCanvas handles its own sizing */}
                     <RahasyaCanvas />
                 </div>
             )}
 
-            {/* LAYER 1: Ambient Effects */}
             <div className="absolute inset-0 opacity-30 pointer-events-none z-1">
                 <div className={`absolute top-[-50%] left-[-50%] w-[200%] h-[200%] ${isRahasya ? 'bg-[conic-gradient(from_0deg,transparent_0_340deg,#dc2626_360deg)] animate-spin-slow' : 'bg-[conic-gradient(from_0deg,transparent_0_340deg,#8a2be2_360deg)] animate-spin-slow'}`}></div>
             </div>
             
-            {/* LAYER 2: Content (Ticket) */}
             <motion.div 
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -78,28 +112,19 @@ export const DigitalTicket: React.FC = () => {
                         <h2 className={`text-2xl font-bold tracking-widest uppercase ${isRahasya ? 'font-special-elite text-white' : 'font-display text-transparent bg-clip-text bg-gradient-to-r from-glitz-gold to-white'}`}>
                             {isRahasya ? 'ACCESS GRANTED' : 'OFFICIAL PASS'}
                         </h2>
-                        <p className="text-[10px] opacity-70 tracking-[0.3em] uppercase mt-1">
-                            {ticketData.event}
-                        </p>
                     </div>
 
-                    {/* Details Body */}
                     <div className="p-6 space-y-6 relative">
-                        
                         <div className="text-center mb-4">
                             <h3 className="text-xl font-bold text-white leading-tight mb-1">{ticketData.attendee_name}</h3>
                             <p className={`text-xs font-bold uppercase ${isRahasya ? 'text-blood' : 'text-drama-light'}`}>{ticketData.college}</p>
-                            
                             <div className="flex items-center justify-center gap-2 mt-2 opacity-70 text-[10px]">
                                 <Mail className="w-3 h-3" />
                                 <span>{ticketData.attendee_email}</span>
                             </div>
                         </div>
 
-                        {/* Data Grid */}
                         <div className={`grid grid-cols-2 gap-y-3 gap-x-4 text-xs p-4 rounded border ${isRahasya ? 'bg-slate-900/50 border-slate-700' : 'bg-white/5 border-white/10'}`}>
-                            
-                            {/* Verification ID Field */}
                             <div className="col-span-2 pb-2 border-b border-white/5">
                                 <p className="opacity-50 text-[9px] uppercase tracking-widest flex items-center gap-1">
                                     <Fingerprint className="w-3 h-3" /> Verification ID
@@ -108,35 +133,54 @@ export const DigitalTicket: React.FC = () => {
                                     {ticketData.verification_id || 'NOT PROVIDED'}
                                 </p>
                             </div>
-
-                            {/* Zone */}
                             <div className="col-span-2 pb-2 border-b border-white/5">
                                 <p className="opacity-50 text-[9px] uppercase tracking-widest">Access Zone</p>
                                 <p className="font-bold text-white text-base">{ticketData.zone}</p>
                             </div>
-
                             <div>
                                 <p className="opacity-50 text-[9px] uppercase tracking-widest">Ticket ID</p>
                                 <p className="font-mono font-bold text-white">{ticketData.ticket_id.split('_')[1] || ticketData.ticket_id}</p>
                             </div>
-
                             <div className="text-right">
                                 <p className="opacity-50 text-[9px] uppercase tracking-widest">Paid</p>
                                 <p className="font-mono text-green-400">₹{ticketData.amount_paid}</p>
                             </div>
-
-                            <div className="col-span-2 pt-2 mt-1 border-t border-white/10 flex justify-between items-center">
-                                <div className="flex items-center gap-1">
-                                    <Clock className="w-3 h-3 opacity-50" />
-                                    <span className="opacity-70 text-[10px]">{formattedDate}</span>
-                                </div>
-                                <div className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${isRahasya ? 'border-green-500/50 text-green-500 bg-green-500/10' : 'bg-green-500 text-white'}`}>
-                                    {ticketData.status}
-                                </div>
-                            </div>
                         </div>
 
-                        {/* Validated Animation */}
+                        {/* --- SCAN HISTORY LOG --- */}
+                        {!loadingHistory && (
+                            <div className={`p-4 rounded border-l-4 ${isReused 
+                                ? 'bg-red-500/10 border-red-500 text-red-200' 
+                                : 'bg-green-500/10 border-green-500 text-green-200'
+                            }`}>
+                                <div className="flex items-start gap-3 mb-3">
+                                    {isReused ? <AlertCircle className="w-5 h-5 shrink-0" /> : <Check className="w-5 h-5 shrink-0" />}
+                                    <div>
+                                        <p className="font-bold text-sm uppercase tracking-wider">
+                                            {isReused ? `Warning: Scanned ${scanCount} Times` : 'Fresh Ticket: First Scan'}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {isReused && (
+                                    <div className="mt-2 text-[10px] font-mono opacity-80 space-y-1 pl-8 border-l border-white/10 ml-2">
+                                        <div className="uppercase opacity-50 mb-1">Recent Activity:</div>
+                                        {scanHistory.slice(0, 3).map((scan, index) => (
+                                            <div key={scan.id} className="flex justify-between">
+                                                <span>
+                                                    {new Date(scan.scanned_at).toLocaleString('en-US', {
+                                                        hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true
+                                                    })}
+                                                </span>
+                                                <span className="opacity-50">{index === 0 ? '(Just Now)' : '(Previous)'}</span>
+                                            </div>
+                                        ))}
+                                        {scanCount > 3 && <div>...and {scanCount - 3} more</div>}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div className="mt-4 flex justify-center">
                             <div className={`w-full py-2 flex items-center justify-center gap-2 font-bold tracking-widest text-[10px] uppercase border ${
                                 isRahasya 

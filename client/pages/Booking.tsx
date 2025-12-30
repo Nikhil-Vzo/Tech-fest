@@ -219,7 +219,8 @@ export const Booking: React.FC = () => {
 
         try {
             // Call the local backend server
-            await fetch('http://localhost:5000/api/send-ticket', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+await fetch(`${apiUrl}/api/send-ticket`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
