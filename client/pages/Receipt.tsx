@@ -32,7 +32,6 @@ export const Receipt: React.FC = () => {
     const { width, height } = useWindowSize();
     const [isDownloading, setIsDownloading] = useState(false);
     
-    // Retrieve data
     const { paymentId, orderId, amount, items, user, verificationId } = location.state || {};
 
     if (!paymentId) {
@@ -67,30 +66,49 @@ export const Receipt: React.FC = () => {
     const encodedData = btoa(JSON.stringify(ticketRawData));
     const qrUrl = `${window.location.origin}/#/ticket-view?data=${encodedData}`;
 
-    // --- FIXED DOWNLOAD FUNCTION ---
+    // --- RESPONSIVE PDF FIX ---
     const handleDownload = async () => {
-        const element = document.getElementById('download-wrapper'); // TARGET BY ID
-        if (!element) {
-            console.error("Receipt element not found!");
-            return;
-        }
+        const originalElement = document.getElementById('download-wrapper');
+        if (!originalElement) return;
 
         setIsDownloading(true);
 
         try {
-            // Wait a moment for UI to settle
+            // 1. Create a CLONE of the element to manipulate it safely
+            const clone = originalElement.cloneNode(true) as HTMLElement;
+
+            // 2. Configure the clone to look like a "Desktop Ticket" regardless of device
+            clone.style.width = "800px"; // Fixed standard width
+            clone.style.position = "absolute";
+            clone.style.top = "-9999px"; // Hide it off-screen
+            clone.style.left = "-9999px";
+            clone.style.padding = "40px";
+            
+            // Ensure background color is hardcoded (transparency breaks PDFs)
+            const bgColor = isRahasya ? '#000000' : '#2e1065';
+            clone.style.backgroundColor = bgColor;
+            
+            // Append clone to body so html2canvas can see it
+            document.body.appendChild(clone);
+
+            // 3. Wait for images/QR in the clone to render (safety buffer)
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            const canvas = await html2canvas(element, {
-                backgroundColor: isRahasya ? '#000000' : '#2e1065', // Hardcode bg color to avoid transparency issues
+            // 4. Capture the CLONE (Perfect layout) instead of the original (Phone layout)
+            const canvas = await html2canvas(clone, {
+                backgroundColor: bgColor,
                 scale: 2, // High resolution
-                useCORS: true, // Allow external images if any
-                logging: false
+                useCORS: true,
+                logging: false,
+                windowWidth: 1024 // Trick it into thinking screen is wide
             });
+
+            // 5. Clean up: Remove clone
+            document.body.removeChild(clone);
 
             const imgData = canvas.toDataURL('image/png');
             
-            // A4 Portrait Setup
+            // 6. Generate PDF (A4 Portrait)
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -98,13 +116,15 @@ export const Receipt: React.FC = () => {
             const imgProps = pdf.getImageProperties(imgData);
             const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            // Add image to PDF
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
+            // Center vertically if it's smaller than page height
+            const yPos = imgHeight < pdfHeight ? (pdfHeight - imgHeight) / 2 : 0;
+
+            pdf.addImage(imgData, 'PNG', 0, yPos, pdfWidth, imgHeight);
             pdf.save(`Ticket_${user?.firstName}_${orderId}.pdf`);
 
         } catch (error) {
-            console.error("PDF Generation Failed:", error);
-            alert("Failed to download PDF. Please try again or take a screenshot.");
+            console.error("PDF Error:", error);
+            alert("Could not generate PDF. Please try screen capture.");
         } finally {
             setIsDownloading(false);
         }
@@ -127,8 +147,9 @@ export const Receipt: React.FC = () => {
                 <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-gradient-to-r blur-3xl opacity-30 pointer-events-none -z-10 ${isRahasya ? 'from-red-900 via-black to-red-900' : 'from-purple-600 via-pink-600 to-blue-600'}`}></div>
 
                 {/* WRAPPER DIV WITH ID FOR CAPTURE */}
-                <div id="download-wrapper" className="p-1">
-                    <Card className={`p-8 text-center relative overflow-hidden shadow-2xl ${isRahasya ? 'bg-black/90 border-red-900/50 shadow-red-900/20' : 'bg-bollywood-800/95 border-drama/50 shadow-drama/30'}`}>
+                {/* Note: We added 'bg-transparent' here because the background is applied during capture manually */}
+                <div id="download-wrapper" className="rounded-xl overflow-hidden">
+                    <Card className={`p-8 text-center relative shadow-2xl ${isRahasya ? 'bg-black/90 border-red-900/50 shadow-red-900/20' : 'bg-bollywood-800/95 border-drama/50 shadow-drama/30'}`}>
                         
                         <div className="mb-6 relative inline-block">
                             <div className={`absolute inset-0 rounded-full animate-ping opacity-75 ${isRahasya ? 'bg-red-600' : 'bg-green-500'}`}></div>
@@ -148,10 +169,10 @@ export const Receipt: React.FC = () => {
                                 <Mail className="w-5 h-5" /> Ticket Sent to Email
                             </div>
                             <p className="text-sm opacity-80 text-center px-4">
-                                Your official entry pass has been mailed to <span className="font-bold underline">{user?.email}</span>.
+                                Official pass mailed to <span className="font-bold underline">{user?.email}</span>.
                             </p>
                             <div className={`mt-2 text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full flex items-center gap-2 ${isRahasya ? 'bg-red-500/20 text-red-300' : 'bg-white/20 text-white'}`}>
-                                <AlertCircle className="w-3 h-3" /> Please scan the mailed ticket at the gate
+                                <AlertCircle className="w-3 h-3" /> Scan mailed ticket at gate
                             </div>
                         </div>
 
@@ -195,7 +216,7 @@ export const Receipt: React.FC = () => {
                     </Card>
                 </div>
 
-                {/* Buttons (OUTSIDE THE CAPTURE DIV) */}
+                {/* Buttons */}
                 <div className="flex flex-col md:flex-row gap-4 justify-center relative z-20 mt-8">
                     <Button onClick={() => navigate('/')} className="flex items-center gap-2 justify-center w-full md:w-auto order-2 md:order-1 opacity-80 hover:opacity-100">
                         <Home className="w-4 h-4" /> Home
@@ -207,7 +228,7 @@ export const Receipt: React.FC = () => {
                     >
                         {isDownloading ? (
                             <>
-                                <Loader2 className="w-5 h-5 animate-spin" /> Generating...
+                                <Loader2 className="w-5 h-5 animate-spin" /> Generating PDF...
                             </>
                         ) : (
                             <>
