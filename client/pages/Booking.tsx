@@ -195,47 +195,46 @@ export const Booking: React.FC = () => {
         return true;
     };
 
-    // --- EMAIL TRIGGER FUNCTION ---
+    // --- EMAIL TRIGGER FUNCTION (FIXED) ---
     const sendConfirmationEmail = async (pId: string, oId: string, amount: number) => {
         if (!userData || !selectedTier) return;
 
-        // Reconstruct the Ticket Data URL used in the QR Code
-        const ticketRawData = {
-            event: "AMISPARK x RAHASYA 2026",
-            ticket_id: oId,
-            payment_ref: pId,
-            attendee_name: `${userData.firstName} ${userData.lastName}`,
-            attendee_email: userData.email,
-            college: userData.college,
-            verification_id: verificationInput,
-            zone: selectedTier.name,
-            amount_paid: amount,
-            status: "CONFIRMED",
-            is_rahasya: isRahasya,
-            issued_at: new Date().toISOString()
-        };
-        const encodedData = btoa(JSON.stringify(ticketRawData));
-        const qrLink = `${window.location.origin}/#/ticket-view?data=${encodedData}`;
-
         try {
-            // Call the local backend server
+            // 1. Get the Correct API URL
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-await fetch(`${apiUrl}/api/send-ticket`, {
+            console.log("Sending email request to:", apiUrl);
+
+            // 2. Send structured data that matches Server expectation
+            const response = await fetch(`${apiUrl}/api/send-ticket`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    email: userData.email,
-                    name: `${userData.firstName} ${userData.lastName}`,
-                    ticketId: oId,
-                    zone: selectedTier.name,
+                    // Wrap user details in a 'user' object (Crucial Fix)
+                    user: { 
+                        firstName: userData.firstName,
+                        lastName: userData.lastName,
+                        email: userData.email,
+                        college: userData.college,
+                        phone: userData.phone
+                    },
+                    orderId: oId,
+                    paymentId: pId,
+                    // Send 'zone' inside 'items' array (Backend expects 'items')
+                    items: [selectedTier.name], 
                     amount: amount,
-                    qrLink: qrLink,
+                    verificationId: verificationInput,
                     isRahasya: isRahasya
                 })
             });
-            console.log("Email request sent to server");
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Server responded with error:", errorData);
+            } else {
+                console.log("Email sent successfully!");
+            }
         } catch (error) {
-            console.error("Failed to send email trigger", error);
+            console.error("Failed to connect to email server:", error);
         }
     };
 
@@ -259,25 +258,46 @@ await fetch(`${apiUrl}/api/send-ticket`, {
 
         // Shared Success Handler
         const onPaymentSuccess = async (pId: string, oId: string) => {
-            // 1. Save to Database
-            await saveBookingToSupabase(pId, oId, totalAmount);
-            
-            // 2. Trigger Email (Fire and Forget - don't await blocking)
-            sendConfirmationEmail(pId, oId, totalAmount);
+            try {
+                // 1. Save to Database
+                await saveBookingToSupabase(pId, oId, totalAmount);
+                
+                // 2. Trigger Email (AWAIT THIS NOW)
+                // We await it so the browser doesn't kill the request during navigation
+                console.log("Attempting to send email..."); 
+                await sendConfirmationEmail(pId, oId, totalAmount); 
+                console.log("Email request completed.");
 
-            // 3. Navigate to Receipt
-            const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
-            navigate(targetPath, {
-                state: {
-                    paymentId: pId,
-                    orderId: oId,
-                    amount: totalAmount,
-                    items: [selectedTier.name, accommodation ? "Accommodation" : null].filter(Boolean),
-                    user: userData,
-                    verificationId: verificationInput
-                }
-            });
-            setIsPaying(false);
+                // 3. Navigate to Receipt
+                const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
+                navigate(targetPath, {
+                    state: {
+                        paymentId: pId,
+                        orderId: oId,
+                        amount: totalAmount,
+                        items: [selectedTier.name, accommodation ? "Accommodation" : null].filter(Boolean),
+                        user: userData,
+                        verificationId: verificationInput
+                    }
+                });
+            } catch (error) {
+                console.error("Critical Booking Error:", error);
+                setToast({ message: "Booking saved, but an error occurred. Please save your receipt.", type: 'error' });
+                // We still navigate to receipt because payment succeeded
+                const targetPath = isRahasya ? '/rahasya/receipt' : '/receipt';
+                navigate(targetPath, {
+                    state: {
+                        paymentId: pId,
+                        orderId: oId,
+                        amount: totalAmount,
+                        items: [selectedTier.name],
+                        user: userData,
+                        verificationId: verificationInput
+                    }
+                });
+            } finally {
+                setIsPaying(false);
+            }
         };
 
         if (razorpayKey) {
