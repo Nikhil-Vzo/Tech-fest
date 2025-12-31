@@ -4,11 +4,48 @@ This is the official web application for **Amispark x Rahasya**, featuring a dua
 
 
 ### ✅ Latest Updates
+-   **Mobile Optimizations**:
+    -   **Zoomable Venue Map**: Pinch-to-zoom functionality for the zone selection layout on mobile.
+    -   **Touch-Friendly Navigation**: Enhanced mobile menu and interactions.
+-   **Booking Enhancements**:
+    -   **Strict Rules**: Restored important verification rules and College ID checks.
+    -   **Smart Validation**: Automatically restricts zones based on College (Amitian vs Non-Amitian).
+    -   **Redirection Logic**: "Transmission Intercepted" modal for Rahasya theme users.
+-   **Visual Polish**:
+    -   **Amispark**: "Sliding Liquid Blob" nav, "Back to Amispark" transitions, floating music notes.
+    -   **Rahasya**: Cinematic "Noir" timeline, consistent dark theming, glitch effects.
 -   **Unified Booking System**: A single, powerful booking engine serving both themes.
-    -   **Visual Venue Map**: Interactive seat selection (Stage, Ramp, Star Circle).
-    -   **Smart Validation**: automatically restricts zones based on College (Amitian vs Non-Amitian).
-    -   **Redirection Logic**: Users accessing "Buy Tickets" from the Rahasya Noir theme are intercepted with a thematic "Transmission Intercepted" modal before being guided to the central booking terminal.
--   **Global Navigation**: Dynamic Navbars that switch styles (Bollywood Gold vs Hacker Noir) based on the active route, with mobile menu support for both.
+
+### 🚀 Installation & Setup
+
+#### Client (Frontend)
+1.  Navigate to the client directory:
+    ```bash
+    cd client
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+
+#### Server (Backend)
+1.  Navigate to the server directory:
+    ```bash
+    cd Server
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Start the backend server:
+    ```bash
+    npm run dev
+    ```
+    *(Note: Ensure you have the necessary `.env` variables set up for database and mail services)*
 
 ### 🎭 Amispark (Premiere Mode)
 -   **Visuals**: Added dynamic "Stage Spotlights", paparazzi flashbulbs, and rising gold dust particles.
