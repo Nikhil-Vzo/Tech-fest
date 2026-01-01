@@ -134,7 +134,7 @@ export const RahasyaAbout: React.FC = () => {
 
                         <motion.div variants={itemVariants} className="mt-8 grid grid-cols-2 gap-4">
                             <div className="bg-slate-900/50 p-4 border-l-2 border-blood">
-                                <h4 className="text-white font-bold text-lg">12+</h4>
+                                <h4 className="text-white font-bold text-lg">Entire Department</h4>
                                 <p className="text-xs uppercase tracking-widest text-slate-500">Suspects (Members)</p>
                             </div>
                             <div className="bg-slate-900/50 p-4 border-l-2 border-blood">
