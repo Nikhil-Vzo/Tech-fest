@@ -312,7 +312,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               <div>
                 <h4 className="font-bold text-glitz-gold mb-4 tracking-widest text-xs">CONTACT INFO</h4>
                 <ul className="space-y-2 text-sm text-glitz-paper/80">
-                  <li className="flex items-start"><MapPin className="w-4 h-4 mr-3 text-drama-light shrink-0" /> Amity University<br />Sector 125, Noida</li>
+                  <li className="flex items-start"><MapPin className="w-4 h-4 mr-3 text-drama-light shrink-0" /> Amity University<br />Raipur, Chhattisgarh</li>
                   <li className="flex items-center"><FileText className="w-4 h-4 mr-3 text-drama-light shrink-0" /> contact@amispark.com</li>
                   <li className="flex items-center"><MessageCircle className="w-4 h-4 mr-3 text-drama-light shrink-0" /> +91 98765 43210</li>
                 </ul>
