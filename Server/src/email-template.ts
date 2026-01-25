@@ -68,7 +68,7 @@ export const generateTicketEmail = (data: any) => {
                 </div>
             </div>
             <div class="footer">
-                SECURE TRANSMISSION | ${new Date().getFullYear()} AMISPARK x RAHASYA
+                SECURE TRANSMISSION | ${new Date().getFullYear()} AMISPARKK x RAHASYA
                 <br>This is an automated message.
             </div>
         </div>
